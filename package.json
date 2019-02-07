@@ -1,0 +1,16 @@
+{
+  "name": "focus",
+  "version": "1.0.0",
+  "description": "Server and FrontEnd for FOCUS Chrome extension and Android APP",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "concurrently \"cd client && npm start\" \"nodemon server\" "
+  },
+  "author": "Vishal Dhawan",
+  "license": "ISC",
+  "dependencies": {
+    "concurrently": "^4.1.0",
+    "express": "^4.16.4"
+  }
+}
