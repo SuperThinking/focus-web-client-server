@@ -10,7 +10,12 @@
   "author": "Vishal Dhawan",
   "license": "ISC",
   "dependencies": {
+    "axios": "^0.18.0",
+    "body-parser": "^1.18.3",
+    "cheerio": "^1.0.0-rc.2",
     "concurrently": "^4.1.0",
-    "express": "^4.16.4"
+    "express": "^4.16.4",
+    "htmlparser2": "^3.10.0",
+    "request": "^2.88.0"
   }
 }
