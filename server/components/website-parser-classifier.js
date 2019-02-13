@@ -5,6 +5,12 @@ var Lemmer = require('lemmer');
 var fs = require('fs');
 const path = require('path');
 
+var videoF = require('./videoStreaming').v;
+var gameF = require('./gaming').g;
+var socialF = require('./socialMedia').s;
+
+var idfs = require('./idfs').idfs;
+
 var freq = {};
 var total = 0;
 /*
@@ -82,8 +88,106 @@ parseAndGetContentz = (urls) => {
     });
 }
 
+tfidf = ()=>{
+    var allWords = {};
+    Object.keys(gameF).map(x=>{
+        allWords[x] = (allWords[x]||0)+1;
+    })
+    Object.keys(videoF).map(x=>{
+        allWords[x] = (allWords[x]||0)+1;
+    })
+    Object.keys(socialF).map(x=>{
+        allWords[x] = (allWords[x]||0)+1;
+    })
+    Object.keys(allWords).map(x=>{
+        allWords[x] = 1+Math.log(3/allWords[x]);
+    })
+    // fs.writeFileSync(path.resolve(__dirname, '../components/idfs.json'), JSON.stringify(allWords));
+    Object.keys(gameF).map(x=>{
+        gameF[x] = [gameF[x], allWords[x], gameF[x]*allWords[x]]
+    })
+    Object.keys(videoF).map(x=>{
+        videoF[x] = [videoF[x], allWords[x], videoF[x]*allWords[x]]
+    })
+    Object.keys(socialF).map(x=>{
+        socialF[x] = [socialF[x], allWords[x], socialF[x]*allWords[x]]
+    })
+    fs.writeFileSync(path.resolve(__dirname, '../components/socialMedia.json'), JSON.stringify(socialF));
+    fs.writeFileSync(path.resolve(__dirname, '../components/videoStreaming.json'), JSON.stringify(videoF));
+    fs.writeFileSync(path.resolve(__dirname, '../components/gaming.json'), JSON.stringify(gameF));
+}
+
+cosineSimilarity = (a, b)=>{
+    var n = 0, d1 = 0, d2 = 0;
+    var k_a = Object.keys(a);
+    for(let i=0; i<k_a.length; i++)
+    {
+        n+=((a[k_a[i]][2])*(b[k_a[i]]?b[k_a[i]][2]:0));
+        d1 += a[k_a[i]][2]*a[k_a[i]][2];
+        d2 += (b[k_a[i]])?b[k_a[i]][2]*b[k_a[i]][2]:0;
+    }
+    return (n/((Math.sqrt(d1))*(Math.sqrt(d2))));
+}
+
+findCategory = (url)=>{
+    var fetch = new Promise((resolve, reject) => {
+        axios.get(url).then(res => {
+            const $ = cheerio.load(res.data);
+            $('script').remove();
+            $('img').remove();
+            $('style').remove();
+            $('meta').remove();
+            var data = $('html *').contents().map(function () {
+                return (this.type === 'text' && $(this).text().trim()[0] != '<' && $(this).text().trim().length > 3) ? $(this).text().trim() + ' ' : '';
+            }).get().join('');
+            return data;
+        })
+        .then(data=>{
+            var tokens = nlp.tokenizer(data);
+            const options = { 'lang': 'en' };
+            return nlp.stopwords(tokens, options)
+        })
+        .then(withoutStopWords => {
+            return withoutStopWords;
+        })
+        .then(tokens => {
+            return Lemmer.lemmatize(tokens);
+        })
+        .then(tokens => {
+            for (var i = 0; i < tokens.length; i++) {
+                var num = tokens[i];
+                if (num.length > 3) {
+                    freq[num] = (freq[num] || 0) + 1;
+                    total++;
+                }
+            }
+
+            Object.keys(freq).map(x=>{
+                freq[x] = [freq[x]/total, (idfs[x])?idfs[x]:0];
+                freq[x].push(freq[x][0]*freq[x][1]);
+            })
+            var c1 = cosineSimilarity(freq, socialF),
+            c2 = cosineSimilarity(freq, gameF),
+            c3 = cosineSimilarity(freq, videoF)
+            console.log(c1);
+            console.log(c2);
+            console.log(c3);
+            return Math.max([c1, c2, c3]);
+        })
+            .catch(error => {
+                throw new Error("Unable to connect");
+            });
+    });
+    return fetch.then((value)=>{
+        console.log(value);
+        return value;
+    })
+}
+
 module.exports = {
-    parseAndGetContentz
+    parseAndGetContentz,
+    tfidf,
+    findCategory
 }
 
 /*

@@ -5,7 +5,7 @@ class App extends Component {
 
   componentDidMount()
   {
-    const data = {"url":"https://www.kongregate.com/"};
+    const data = {"url":"https://www.dailymotion.com/us"};
     Axios.post('/insert', data).then(res=>{
       console.log(res);
     });
