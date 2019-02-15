@@ -102,7 +102,7 @@ tfidf = ()=>{
     Object.keys(allWords).map(x=>{
         allWords[x] = 1+Math.log(3/allWords[x]);
     })
-    // fs.writeFileSync(path.resolve(__dirname, '../components/idfs.json'), JSON.stringify(allWords));
+    fs.writeFileSync(path.resolve(__dirname, '../components/idfs.json'), JSON.stringify(allWords));
     Object.keys(gameF).map(x=>{
         gameF[x] = [gameF[x], allWords[x], gameF[x]*allWords[x]]
     })
@@ -123,13 +123,16 @@ cosineSimilarity = (a, b)=>{
     for(let i=0; i<k_a.length; i++)
     {
         n+=((a[k_a[i]][2])*(b[k_a[i]]?b[k_a[i]][2]:0));
-        d1 += a[k_a[i]][2]*a[k_a[i]][2];
+        d1 += (b[k_a[i]])?a[k_a[i]][2]*a[k_a[i]][2]:0;
         d2 += (b[k_a[i]])?b[k_a[i]][2]*b[k_a[i]][2]:0;
     }
-    return (n/((Math.sqrt(d1))*(Math.sqrt(d2))));
+    return (n!==0)?(n/((Math.sqrt(d1))*(Math.sqrt(d2)))):0;
 }
 
 findCategory = (url)=>{
+    freq = {};
+    total = 0;
+    console.log('Fetching..')
     var fetch = new Promise((resolve, reject) => {
         axios.get(url).then(res => {
             const $ = cheerio.load(res.data);
@@ -166,20 +169,18 @@ findCategory = (url)=>{
                 freq[x] = [freq[x]/total, (idfs[x])?idfs[x]:0];
                 freq[x].push(freq[x][0]*freq[x][1]);
             })
-            var c1 = cosineSimilarity(freq, socialF),
-            c2 = cosineSimilarity(freq, gameF),
-            c3 = cosineSimilarity(freq, videoF)
-            console.log(c1);
-            console.log(c2);
-            console.log(c3);
-            return Math.max([c1, c2, c3]);
+            var c1 = cosineSimilarity(freq, socialF);
+            var c2 = cosineSimilarity(freq, videoF);
+            var c3 = cosineSimilarity(freq, gameF);
+            console.log(c1, c2, c3);
+            resolve((c1>c2)?(c3>c1)?"Gaming Website":"Social Media":(c3>c2)?"Gaming Website":"Online TV");
         })
-            .catch(error => {
-                throw new Error("Unable to connect");
-            });
+        .catch(error => {
+            throw new Error("Unable to connect");
+        });
     });
     return fetch.then((value)=>{
-        console.log(value);
+        console.log("==>"+value);
         return value;
     })
 }
