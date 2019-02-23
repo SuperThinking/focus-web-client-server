@@ -12,38 +12,3 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
 }
-
-h1 {
-  font-family: 'Coda Caption', sans-serif;
-}
-
-#main-div{
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-content: center;
-}
-button{
-  font-size: 1.3em;
-  outline: none;
-  border-radius: 10px;
-  width: max-content;
-  align-self: center;
-}
-button:hover{
-  cursor: pointer;
-}
-input{
-  outline: none;
-  text-align: center;
-  font-size: 2em;
-  border-radius: 5px;
-  height: 3em;
-  min-width: 40%;
-  /* width: max-content; */
-  align-self: center;
-}
-#abc{
-  margin-top: 2%;
-  font-size: 3em;
-}

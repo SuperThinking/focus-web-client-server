@@ -9,6 +9,8 @@ var videoF = require('./categoriesTrain/videoStreaming').v;
 var gameF = require('./categoriesTrain/gaming').g;
 var socialF = require('./categoriesTrain/socialMedia').s;
 
+var cosineSimilarity = require('./models/cosineSimilarity').findcosineSimilarity
+
 var idfs = require('./categoriesTrain/idfs').idfs;
 
 var freq = {};
@@ -117,18 +119,6 @@ tfidf = ()=>{
     fs.writeFileSync(path.resolve(__dirname, '../components/gaming.json'), JSON.stringify(gameF));
 }
 
-cosineSimilarity = (a, b)=>{
-    var n = 0, d1 = 0, d2 = 0;
-    var k_a = Object.keys(a);
-    for(let i=0; i<k_a.length; i++)
-    {
-        n+=((a[k_a[i]][2])*(b[k_a[i]]?b[k_a[i]][2]:0));
-        d1 += (b[k_a[i]])?a[k_a[i]][2]*a[k_a[i]][2]:0;
-        d2 += (b[k_a[i]])?b[k_a[i]][2]*b[k_a[i]][2]:0;
-    }
-    return (n!==0)?(n/((Math.sqrt(d1))*(Math.sqrt(d2)))):0;
-}
-
 findCategory = (url)=>{
     freq = {};
     total = 0;
@@ -141,7 +131,7 @@ findCategory = (url)=>{
             $('style').remove();
             $('meta').remove();
             var data = $('html *').contents().map(function () {
-                return (this.type === 'text' && $(this).text().trim()[0] != '<' && $(this).text().trim().length > 3) ? $(this).text().trim() + ' ' : '';
+                return (this.type === 'text' && $(this).text().trim()[0] != '<') ? $(this).text().trim() + ' ' : '';
             }).get().join('');
             return data;
         })
@@ -169,11 +159,10 @@ findCategory = (url)=>{
                 freq[x] = [freq[x]/total, (idfs[x])?idfs[x]:0];
                 freq[x].push(freq[x][0]*freq[x][1]);
             })
-            var c1 = cosineSimilarity(freq, socialF);
-            var c2 = cosineSimilarity(freq, videoF);
-            var c3 = cosineSimilarity(freq, gameF);
-            console.log(c1, c2, c3);
-            resolve((c1>c2)?(c3>c1)?"Gaming Website":"Social Media":(c3>c2)?"Gaming Website":"Online TV");
+            var scores = cosineSimilarity(freq, {"Social Media":socialF, "Online TV":videoF, "Gaming Website":gameF})
+            console.log(scores);
+            console.log(freq)
+            resolve(scores[Math.max(...Object.keys(scores))]);
         })
         .catch(error => {
             throw new Error("Unable to connect");
@@ -190,10 +179,3 @@ module.exports = {
     tfidf,
     findCategory
 }
-
-/*
-Categories
-Entertainment -> Games, Movies, Social Media
-Productivity
-Others
-*/
