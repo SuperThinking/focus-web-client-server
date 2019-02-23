@@ -24,7 +24,7 @@ MongoClient.connect("mongodb://user:user@focus-shard-00-00-vsbgw.mongodb.net:270
     }
 })
 
-app.get('/', (req, res)=>{
+app.get('/*', (req, res)=>{
     response.sendFile(path.resolve(__dirname, '../client/build', 'index.html'));
 });
 
