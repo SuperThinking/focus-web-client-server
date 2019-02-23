@@ -5,11 +5,11 @@ var Lemmer = require('lemmer');
 var fs = require('fs');
 const path = require('path');
 
-var videoF = require('./videoStreaming').v;
-var gameF = require('./gaming').g;
-var socialF = require('./socialMedia').s;
+var videoF = require('./categoriesTrain/videoStreaming').v;
+var gameF = require('./categoriesTrain/gaming').g;
+var socialF = require('./categoriesTrain/socialMedia').s;
 
-var idfs = require('./idfs').idfs;
+var idfs = require('./categoriesTrain/idfs').idfs;
 
 var freq = {};
 var total = 0;

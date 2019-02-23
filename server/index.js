@@ -34,7 +34,8 @@ app.post('/insert', urlencodedParser, (req, res)=>{
     })
     .catch(error=>{
         res.contentType('application/json');
-        res.send(`{"message":"${error.errno}"}`);
+        // res.send(`{"message":"${error.errno}"}`);
+        res.send('{"message":"Unable to reach URL"}');
     })
 })
 
