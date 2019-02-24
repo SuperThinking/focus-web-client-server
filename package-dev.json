@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "concurrently \"cd client && npm start\" \"nodemon server\" "
+    "start": "concurrently \"cd client && npm run build\" \"nodemon server\" "
   },
   "author": "Vishal Dhawan",
   "license": "ISC",

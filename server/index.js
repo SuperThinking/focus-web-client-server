@@ -24,11 +24,7 @@ MongoClient.connect("mongodb://user:user@focus-shard-00-00-vsbgw.mongodb.net:270
     }
 })
 
-app.get('*', (req, res)=>{
-    res.sendFile(path.resolve(__dirname, '../client/build', 'index.html'));
-});
-
-app.post('/insert', urlencodedParser, (req, res)=>{
+app.post('/api/insert', urlencodedParser, (req, res)=>{
     var url = req.body.url;
     var id = req.body.id;
     if(id!==undefined||url!==undefined)
@@ -58,7 +54,7 @@ app.post('/insert', urlencodedParser, (req, res)=>{
     }
 })
 
-app.post('/login', urlencodedParser, (req, res)=>{
+app.post('/api/login', urlencodedParser, (req, res)=>{
     var p = new Promise((resolve, reject)=>{
         login_db.collection('login-info').find({$and:[{'username':req.body.username}, {'password':req.body.password}]}).toArray().then(x=>{
             (x.length)?resolve(`{"unique_id":"${x[0]['unique_id']}"}`):reject('{"unique_id":"Incorrect Username/Password"}');
@@ -69,6 +65,16 @@ app.post('/login', urlencodedParser, (req, res)=>{
     }).catch(x=>{
         res.send(x)
     })
+});
+
+app.get('/api/test', (req, res)=>{
+    res.send(
+        `<div>Hey!</div>`
+    )
+})
+
+app.get('/*', (req, res)=>{
+    res.sendFile(path.resolve(__dirname, '../client/build', 'index.html'));
 });
 
 app.listen(port, ()=>{

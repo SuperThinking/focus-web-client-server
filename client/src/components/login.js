@@ -13,7 +13,7 @@ class Login extends Component
             "username": this.state.username,
             "password": this.state.password
         }
-        Axios.post("/login", data).then(response=>{
+        Axios.post("/api/login", data).then(response=>{
             console.log(response);
         })
     }

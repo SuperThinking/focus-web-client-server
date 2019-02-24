@@ -161,7 +161,6 @@ findCategory = (url)=>{
             })
             var scores = cosineSimilarity(freq, {"Social Media":socialF, "Online TV":videoF, "Gaming Website":gameF})
             console.log(scores);
-            console.log(freq)
             resolve(scores[Math.max(...Object.keys(scores))]);
         })
         .catch(error => {

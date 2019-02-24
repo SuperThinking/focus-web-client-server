@@ -12,7 +12,7 @@ class Home extends Component {
 
     fetchGenre = (e) => {
         const data = { "url": this.state.website, "id": 1313 };
-        Axios.post('/insert', data).then(res => {
+        Axios.post('/api/insert', data).then(res => {
             return res.data;
         })
         .then((data) => {
