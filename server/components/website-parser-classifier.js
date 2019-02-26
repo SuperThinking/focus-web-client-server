@@ -40,7 +40,7 @@ processText = (data) => {
                     var num = tokens[i];
                     if (num.length > 3) {
                         freq[num] = (freq[num] || 0) + 1;
-                        total++
+                        total++;
                     }
                 }
                 resolve(1);

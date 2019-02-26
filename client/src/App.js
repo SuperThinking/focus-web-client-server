@@ -1,22 +1,45 @@
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import './App.css';
-import {Route, BrowserRouter, Switch} from 'react-router-dom';
-import Home from './components/home'
-import Login from './components/login'
-import Error404 from './components/error404'
+import Routes from './Routes';
+import {withRouter} from 'react-router-dom';
+
 class App extends Component {
 
+  constructor(props) {
+    super(props);
+  
+    this.state = {
+      isAuthenticated: false,
+      unique_id: ""
+    };
+  }
+  
+  userHasAuthenticated = (authenticated, unique_id) => {
+    if(authenticated)
+      this.setState({ isAuthenticated: authenticated, unique_id:unique_id});
+    else
+      this.setState({ isAuthenticated: authenticated});
+  }
+
+  handleLogout = ()=>{
+    this.userHasAuthenticated(false);
+    this.props.history.push("/login");
+  }
+
   render() {
+    const childProps = {
+      isAuthenticated: this.state.isAuthenticated,
+      userHasAuthenticated: this.userHasAuthenticated,
+      unique_id: this.state.unique_id
+    };
+
     return (
-      <BrowserRouter>
-      <Switch>
-        <Route exact path='/' component={Home}/>
-        <Route path='/login' component={Login}/>
-        <Route component={Error404}/>
-      </Switch>
-      </BrowserRouter>
+      <div>
+        {this.state.isAuthenticated?"YES":"NO"}
+        <Routes childProps={childProps} />
+      </div>
     );
   }
 }
 
-export default App;
+export default withRouter(App);

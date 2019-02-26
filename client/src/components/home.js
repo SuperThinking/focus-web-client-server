@@ -11,7 +11,7 @@ class Home extends Component {
     myRef = React.createRef();
 
     fetchGenre = (e) => {
-        const data = { "url": this.state.website, "id": 1313 };
+        const data = { "url": this.state.website, "id": this.props.unique_id };
         Axios.post('/api/insert', data).then(res => {
             return res.data;
         })
@@ -22,15 +22,20 @@ class Home extends Component {
         });
     }
     render() {
+        var yes = <div>
+        <h1 align='center'>FOCUS</h1>
+        <div id="main-div">
+            USER ID => {this.props.unique_id}
+            <input type='text' value={this.state.website} onChange={(event) => this.setState({ website: event.target.value })} />
+            <br />
+            <button onClick={this.fetchGenre}>Get Category</button>
+            <div id='abc' ref={(divElement) => this.divElement = divElement} align='center'></div>
+        </div>
+    </div>;
+
         return (
             <div>
-                <h1 align='center'>FOCUS</h1>
-                <div id="main-div">
-                    <input type='text' value={this.state.website} onChange={(event) => this.setState({ website: event.target.value })} />
-                    <br />
-                    <button onClick={this.fetchGenre}>Get Category</button>
-                    <div id='abc' ref={(divElement) => this.divElement = divElement} align='center'></div>
-                </div>
+                {(this.props.isAuthenticated)?yes:"NO"}
             </div>
         )
     }

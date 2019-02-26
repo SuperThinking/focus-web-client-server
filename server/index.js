@@ -10,7 +10,7 @@ const port = process.env.PORT || 5000;
 
 var urlencodedParser = bodyParser.urlencoded({ extended: false })
 
-var login_db;
+var login_db, usage_db;
 
 app.use(express.static(path.resolve(__dirname, '../client/build')));
 app.use(bodyParser.json());
@@ -21,6 +21,7 @@ MongoClient.connect("mongodb://user:user@focus-shard-00-00-vsbgw.mongodb.net:270
     else
     {
         login_db = client.db('user-creds');
+        usage_db = client.db('usage_track');
     }
 })
 
@@ -39,9 +40,12 @@ app.post('/api/insert', urlencodedParser, (req, res)=>{
                 resolve(parseClassify.findCategory(url));
             });
             x.then((category)=>{
-                res.contentType('application/json');
-                res.send(`{"message":"${id}:${category}"}`);
+                // res.contentType('application/json');
+                // res.send(`{"message":"${id}:${category}"}`);
+                usage_db.collection('entertainment').insert({"user_id":id, "category":category, "time":"NULL"});
             })
+            res.contentType('application/json');
+            res.send(`{"message":"URL : ${url} added"}`);
         })
         .catch(error=>{
             res.contentType('application/json');
@@ -57,7 +61,7 @@ app.post('/api/insert', urlencodedParser, (req, res)=>{
 app.post('/api/login', urlencodedParser, (req, res)=>{
     var p = new Promise((resolve, reject)=>{
         login_db.collection('login-info').find({$and:[{'username':req.body.username}, {'password':req.body.password}]}).toArray().then(x=>{
-            (x.length)?resolve(`{"unique_id":"${x[0]['unique_id']}"}`):reject('{"unique_id":"Incorrect Username/Password"}');
+            (x.length)?resolve(`{"unique_id":"${x[0]['unique_id']}", "status":"true"}`):reject('{"unique_id":"Incorrect Username/Password", "status":"false"}');
         });
     })
     p.then(x=>{
