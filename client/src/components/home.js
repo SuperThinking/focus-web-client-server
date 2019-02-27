@@ -2,13 +2,12 @@ import React, { Component } from 'react'
 import '../App.css';
 import Axios from 'axios';
 import './styles/home.css'
+import FOCUS from './focus';
 
 class Home extends Component {
     state = {
         website: ''
     }
-
-    myRef = React.createRef();
 
     fetchGenre = (e) => {
         const data = { "url": this.state.website, "id": this.props.unique_id };
@@ -21,6 +20,11 @@ class Home extends Component {
             this.divElement.innerHTML = category;
         });
     }
+
+    componentDidUpdate(pp, ps){
+        console.log(this.props.isAuthenticated);
+    }
+
     render() {
         var yes = <div>
         <h1 align='center'>FOCUS</h1>
@@ -31,11 +35,11 @@ class Home extends Component {
             <button onClick={this.fetchGenre}>Get Category</button>
             <div id='abc' ref={(divElement) => this.divElement = divElement} align='center'></div>
         </div>
-    </div>;
+        </div>;
 
         return (
             <div>
-                {(this.props.isAuthenticated)?yes:"NO"}
+                {(this.props.isAuthenticated)?yes:<FOCUS/>}
             </div>
         )
     }

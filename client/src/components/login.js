@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import Axios from 'axios';
-
+import './styles/login.css'
 class Login extends Component {
     state = {
         username: "",
@@ -28,15 +28,20 @@ class Login extends Component {
         console.log(e.target.name)
         this.setState({ [e.target.name]: e.target.value })
     }
+    componentDidUpdate()
+    {
+        if(this.props.isAuthenticated)
+            this.props.history.push("/");
+    }
     render() {
         return (
-            <div>
-                <h1 align='center'>Dummy Login Page</h1>
-                <form align='center'>
+            <div align='center' className='full-login'>
+                <h1>Login</h1>
+                <form>
                     <input name='username' type='text' placeholder='username' value={this.state.username} onChange={this.handleChange} />
                     <input name='password' type='password' placeholder='password' value={this.state.password} onChange={this.handleChange} />
                     <br /><br />
-                    <input type='submit' name='Login' onClick={this.loginUser} />
+                    <input disabled={this.state.username.length?"":"disabled"} className='submitForm' type='submit' name='Login' value='Login' onClick={this.loginUser} />
                 </form>
             </div>
         )
