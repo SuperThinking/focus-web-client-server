@@ -5,13 +5,13 @@ var Lemmer = require('lemmer');
 var fs = require('fs');
 const path = require('path');
 
-var videoF = require('./categoriesTrain/videoStreaming').v;
-var gameF = require('./categoriesTrain/gaming').g;
-var socialF = require('./categoriesTrain/socialMedia').s;
+var videoF = require('./backups/videoStreaming').v;
+var gameF = require('./backups/gaming').g;
+var socialF = require('./backups/socialMedia').s;
 
 var cosineSimilarity = require('./models/cosineSimilarity').findcosineSimilarity
 
-var idfs = require('./categoriesTrain/idfs').idfs;
+var idfs = require('./backups/idfs').idfs;
 
 var freq = {};
 var total = 0;
@@ -139,9 +139,6 @@ findCategory = (url)=>{
             var tokens = nlp.tokenizer(data);
             const options = { 'lang': 'en' };
             return nlp.stopwords(tokens, options)
-        })
-        .then(withoutStopWords => {
-            return withoutStopWords;
         })
         .then(tokens => {
             return Lemmer.lemmatize(tokens);

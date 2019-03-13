@@ -1,10 +1,10 @@
 const express = require('express');
 const path = require('path');
-var parseClassify = require('./components/website-parser-classifier');
 var bodyParser = require('body-parser');
 var axios = require('axios');
 var MongoClient = require('mongodb').MongoClient;
 var app = express();
+var crawler = require('./components/crawlerTrain');
 
 const port = process.env.PORT || 5000;
 
@@ -32,12 +32,20 @@ app.post('/api/insert', urlencodedParser, (req, res)=>{
     {
         axios(url).then(response=>{
             var x = new Promise((resolve, reject)=>{
-                resolve(parseClassify.findCategory(url));
+                // resolve(parseClassify.findCategory(url));
+                resolve(crawler.getCategory(url));
             });
+
+            // For Testing
+            x.then(category=>{
+                console.log(category);
+            })
+
+            // Adds URL Category to MongoDB
             x.then((category)=>{
                 // res.contentType('application/json');
                 // res.send(`{"message":"${id}:${category}"}`);
-                usage_db.collection('entertainment').insert({"user_id":id, "category":category, "time":"NULL"});
+                // usage_db.collection('entertainment').insert({"user_id":id, "category":category, "time":"NULL"});
             })
             res.contentType('application/json');
             res.send(`{"message":"URL : ${url} added"}`);

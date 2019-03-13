@@ -4,7 +4,7 @@
 .mainNavBar{
     margin-top: 10px;
     width: 100%;
-    height: max-content;
+    height: 100%;
     background-color: rgb(94, 115, 231);
     display: flex;
     flex-direction: row-reverse;
