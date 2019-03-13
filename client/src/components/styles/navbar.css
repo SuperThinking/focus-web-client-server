@@ -15,7 +15,7 @@
 }
 .webHeadingText:hover{
     cursor: pointer;
-    animation: shake 0.9s;
+    animation: shake 1.0s;
     animation-iteration-count: infinite;
 }
 @keyframes shake {

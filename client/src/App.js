@@ -3,7 +3,7 @@ import './App.css';
 import Routes from './Routes';
 import { withRouter } from 'react-router-dom';
 import NavBar from './components/navBar';
-import FOCUS from './components/focus';
+// import CryptoJS from 'crypto-js';
 
 class App extends Component {
 
@@ -12,7 +12,8 @@ class App extends Component {
 
     this.state = {
       isAuthenticated: false,
-      unique_id: ""
+      unique_id: "",
+      location: "initial"
     };
   }
 
@@ -33,23 +34,32 @@ class App extends Component {
   handleLogout = () => {
     localStorage.clear();
     this.userHasAuthenticated(false);
-    this.props.history.push("/login");
+    this.props.history.push("/");
+  }
+
+  internalRouting = (x) => {
+    console.log(x);
+    this.setState({location:x});
   }
 
   render() {
     const childProps = {
       isAuthenticated: this.state.isAuthenticated,
       userHasAuthenticated: this.userHasAuthenticated,
-      unique_id: this.state.unique_id
+      unique_id: this.state.unique_id,
+      location:this.state.location
     };
-
-
+    const navProps = {
+      isAuthenticated: this.state.isAuthenticated,
+      handleLogout: this.handleLogout,
+      internalRouting: this.internalRouting
+    }
 
     return (
       <div>
-        <NavBar />
+        <NavBar p={navProps}/>
         <div className='belowNavbar'>
-          <FOCUS />
+          <Routes childProps={childProps} />
         </div>
       </div>
     );

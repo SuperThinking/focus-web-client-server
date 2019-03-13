@@ -24,3 +24,67 @@
 .extensionImg{
     width: 500px;
 }
+
+.inputInfo{
+    font-size: 30px;
+    color: #EDF5E1;
+}
+
+.loginInput{
+    outline: none;
+    border-radius: 20px;
+    border:none;
+
+    font-size: 30px;
+    text-align: center;
+}
+.loginInput:focus{
+    background: antiquewhite;
+}
+
+.loginButton{
+    position: relative;
+    overflow: hidden;
+
+    text-align: center;
+    font-size: 1.5em;
+
+    outline: none;
+    margin-right: 10px;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+
+    min-height: max-content;
+    max-height: 50px;
+
+    color: #0B0C10;
+    background-color: #45A29E;
+
+    transition:         0.208s ease-in;
+    -o-transition:      0.208s ease-in;
+    -ms-transition:     0.208s ease-in;
+    -moz-transition:    0.208s ease-in;
+    -webkit-transition: 0.208s ease-in;
+}
+.loginButton:hover{
+    outline: none;
+    cursor: pointer;
+}
+.loginButton:active{
+    box-shadow: 0 5px #666;
+    transform: translateY(2px);
+}
+.loginButton:disabled{
+    background: rgb(46, 107, 104);
+    cursor: default;
+}
+
+.uniqueInput{
+    margin-top: 40px;
+}
+
+.lsForm{
+    margin-bottom: 10px;
+}
