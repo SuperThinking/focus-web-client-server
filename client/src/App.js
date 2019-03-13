@@ -3,6 +3,7 @@ import './App.css';
 import Routes from './Routes';
 import { withRouter } from 'react-router-dom';
 import NavBar from './components/navBar';
+import FOCUS from './components/focus';
 
 class App extends Component {
 
@@ -42,13 +43,14 @@ class App extends Component {
       unique_id: this.state.unique_id
     };
 
-    var no = <NavBar options={['Sign Up', 'Login']} />
-    var yes = <NavBar options={['Logout']} handleLogout={this.handleLogout}/>
+
 
     return (
       <div>
-        {(this.state.isAuthenticated) ? yes : no}
-        <Routes childProps={childProps} />
+        <NavBar />
+        <div className='belowNavbar'>
+          <FOCUS />
+        </div>
       </div>
     );
   }
