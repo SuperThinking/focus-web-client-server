@@ -1,0 +1,36 @@
+.mainDashboard{
+    margin: 10px;
+    display: flex;
+    flex-direction: column;
+}
+
+.dashboardHeader{
+    color: #EDF5E1;
+    
+    flex-basis: 20%;
+
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+.DheaderItems{
+    text-align: center;
+    flex-basis: 25%;
+}
+.dashboardBody{
+    flex-basis: 80%;
+}
+
+.dItems{
+    outline: none;
+    color: #EDF5E1;
+    background-color: transparent;
+    border-style: ridge;
+    border-color: #05386B;
+    font-size: 30px;
+}
+
+.dItems:hover{
+    cursor: pointer;
+    background-color: #05386B;
+}
