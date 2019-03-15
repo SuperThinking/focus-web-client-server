@@ -26,6 +26,22 @@ MongoClient.connect("mongodb://user:user@focus-shard-00-00-vsbgw.mongodb.net:270
     }
 })
 
+app.post('/api/gettime', urlencodedParser, (req, res) => {
+    var id = req.body.id;
+    var k = new Promise((resolve, reject) => {
+        usage_db.collection('entertainment').find({ 'user_id': id }).toArray().then(x => {
+            resolve(x[0].dates[0]);
+        })
+        .catch(x=>{
+            resolve({'message':'Invalid user id'})
+        })
+    });
+
+    k.then(result=>{
+        res.send(result);
+    })
+})
+
 app.post('/api/insert', urlencodedParser, (req, res) => {
     var url = req.body.url;
     var id = req.body.id;
@@ -37,15 +53,8 @@ app.post('/api/insert', urlencodedParser, (req, res) => {
                 resolve(crawler.getCategory(url));
             });
 
-            // For Testing
-            // x.then(category => {
-            //     console.log(category);
-            // })
-
             // Adds URL Category to MongoDB
             x.then((category) => {
-                // res.contentType('application/json');
-                // res.send(`{"message":"${id}:${category}"}`);
                 console.log(category, currentDate);
                 if (category === 'Gaming' || category === 'Online TV' || category === 'Social Media') {
                     usage_db.collection('entertainment').find({ 'user_id': id }).toArray().then(x => {
@@ -121,10 +130,55 @@ app.post('/api/insert', urlencodedParser, (req, res) => {
                             }
                         }
                         else {
-                            usage_db.collection('entertainment').insert({ 'user_id': id, dates: [] });
+                            var entObj = { 'gaming': 0, 'socialmedia': 0, 'onlinetv': 0 };
+                            entObj[category.toLowerCase().split(' ').join('')] = timeSpent;
+
+                            usage_db.collection('limits').find({ 'user_id': id }).toArray().then(y => {
+                                if (y.length) {
+                                    const firstObject = {
+                                        'user_id': id,
+                                        'dates': [{
+                                            "date": new Date(),
+                                            "gaming": {
+                                                "limit": parseInt(y[0].gaming),
+                                                "used": entObj['gaming']
+                                            },
+                                            "onlinetv": {
+                                                "limit": parseInt(y[0].onlinetv),
+                                                "used": entObj['onlinetv']
+                                            },
+                                            "socialmedia": {
+                                                "limit": parseInt(y[0].socialmedia),
+                                                "used": entObj['socialmedia']
+                                            }
+                                        }]
+                                    }
+                                    usage_db.collection('entertainment').insert(firstObject);
+                                }
+                                else {
+                                    const firstObject = {
+                                        'user_id': id,
+                                        'dates': [{
+                                            "date": new Date(),
+                                            "gaming": {
+                                                "limit": -1,
+                                                "used": entObj['gaming']
+                                            },
+                                            "onlinetv": {
+                                                "limit": -1,
+                                                "used": entObj['onlinetv']
+                                            },
+                                            "socialmedia": {
+                                                "limit": -1,
+                                                "used": entObj['socialmedia']
+                                            }
+                                        }]
+                                    }
+                                    usage_db.collection('entertainment').insert(firstObject);
+                                }
+                            });
                         }
                     })
-                    // usage_db.collection('entertainment').update({'user_id':id}, )
                 }
                 else if (category === 'Productivity') {
                     console.log('Productivity Coming Soon');
