@@ -1,5 +1,4 @@
 import React, { Component } from 'react'
-import Axios from 'axios';
 import FOCUS from './focus';
 import Dashboard from './dashboard';
 

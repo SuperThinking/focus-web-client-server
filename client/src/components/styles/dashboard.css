@@ -1,36 +1,83 @@
-.mainDashboard{
+.mainDashboard {
     margin: 10px;
     display: flex;
     flex-direction: column;
 }
 
-.dashboardHeader{
+.dashboardHeader {
     color: #EDF5E1;
-    
     flex-basis: 20%;
-
     display: flex;
     flex-direction: row;
     align-items: center;
 }
-.DheaderItems{
+
+.DheaderItems {
     text-align: center;
     flex-basis: 25%;
 }
-.dashboardBody{
+
+.dashboardBody {
     flex-basis: 80%;
+    margin-left: 20px;
 }
 
-.dItems{
+.dItems {
     outline: none;
     color: #EDF5E1;
     background-color: transparent;
     border-style: ridge;
     border-color: #05386B;
     font-size: 30px;
+    font-family: 'Raleway', sans-serif;
 }
 
-.dItems:hover{
+.dItems:hover {
     cursor: pointer;
     background-color: #05386B;
+}
+
+.setLimitWrapper {
+    align-items: center;
+    color: #EDF5E1;
+}
+
+.limitInput {
+    outline: none;
+    background-color: transparent;
+    border-style: solid;
+    border-color: beige;
+    width: 50px;
+
+    color: aliceblue;
+    text-align: center;
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 15px;
+}
+
+.setLimitButton{
+    margin-top: 20px;
+    border-radius: 5px;
+    outline: none;
+    border-color: #5CDB95;
+    background-color: transparent;
+    color: rgb(217, 236, 224);
+    font-size: 15px;
+}
+.setLimitButton:hover{
+    cursor: pointer;
+}
+.setLimitButton:active{
+    box-shadow: 0 5px #0F292F;
+    transform: translateY(1px);
+}
+
+input[type=number]::-webkit-inner-spin-button, 
+input[type=number]::-webkit-outer-spin-button { 
+  -webkit-appearance: none; 
+  margin: 0; 
+}
+
+.childItem{
+    font-size: 20px;
 }

@@ -109,8 +109,8 @@ crawlMultiple = urls => {
 getCategory = url => {
     freq = {};
     total = 0;
-    var x = new Promise((resolve, reject)=>resolve(crawlSingle(url)));
-    return x.then((tokens)=>{
+    var x = new Promise((resolve, reject) => resolve(crawlSingle(url)));
+    return x.then((tokens) => {
         for (var i = 0; i < tokens.length; i++) {
             var num = tokens[i];
             if (num.length > 3) {
@@ -118,17 +118,18 @@ getCategory = url => {
                 total++;
             }
         }
-        Object.keys(freq).map(x=>{
-            freq[x] = [freq[x]/total, (idfs[x])?idfs[x][1]:0];
-            freq[x].push(freq[x][0]*freq[x][1]);
+        Object.keys(freq).map(x => {
+            freq[x] = [freq[x] / total, (idfs[x]) ? idfs[x][1] : 0];
+            freq[x].push(freq[x][0] * freq[x][1]);
         })
         var files = ['game', 'onlinetv', 'socialmedia', 'productivity', 'ecommerce'];
-        //"Naive Bayes" is giving the better approximations of probability
+        // "Naive Bayes" is giving the better approximations of probability
         var scores = naiveBayes(freq, {"Gaming":category[0], "Online TV":category[1], "Social Media":category[2], "Productivity":category[3], "ECommerce":category[4]})
-        //"Cosine Similairty" is giving good results but not quite accurate
+        // "Cosine Similairty" is giving good results but not quite accurate
         // var scores = cosineSimilarity(freq, {"Gaming":category[0], "Online TV":category[1], "Social Media":category[2], "Productivity":category[3], "ECommerce":category[4]})
+
         console.log(scores);
-        return(scores[Math.max(...Object.keys(scores))]);
+        return (scores[Math.max(...Object.keys(scores))]);
     })
 }
 
