@@ -197,7 +197,6 @@ updateTime = (category, id, timeSpent, subCategory) => {
         '$inc': incObject
     }, (err, res) => {
         if (err) console.log('Error ' + err);
-        console.log('Done');
     });
 }
 
@@ -230,7 +229,6 @@ app.post('/api/insert', urlencodedParser, (req, res) => {
 
             // Adds URL Category to MongoDB
             x.then((category) => {
-                console.log(category, currentDate);
                 if (category === 'gaming' || category === 'onlinetv' || category === 'socialmedia') {
                     exists('entertainment', id).then(result => {
                         if (result)
@@ -298,7 +296,6 @@ app.post('/api/modifylimit', urlencodedParser, (req, res) => {
                     else {
                         usage_db.collection('entertainment').find({ 'user_id': req.body.user }).toArray().then(x => {
                             if (x.length) {
-                                console.log(x);
                                 if (x[0].dates.length && convDate(x[0].dates[0].date) === currentDate) {
                                     usage_db.collection('entertainment').updateOne({ 'user_id': req.body.user }, { '$set': { 'dates.0.gaming.limit': gaming, 'dates.0.onlinetv.limit': onlinetv, 'dates.0.socialmedia.limit': socialmedia } }, (err, res) => {
                                         if (err) {
