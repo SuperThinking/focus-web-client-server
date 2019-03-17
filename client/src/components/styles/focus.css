@@ -88,3 +88,16 @@
 .lsForm{
     margin-bottom: 10px;
 }
+
+@media (max-width: 767px) {
+    .mainBody{
+        display: flex;
+        flex-direction: column;
+    }
+    .leftPanel{
+        font-size: 15px;
+    }
+    .extensionImg{
+        width: 75%;
+    }
+}

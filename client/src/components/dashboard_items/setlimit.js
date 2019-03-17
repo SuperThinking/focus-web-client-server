@@ -40,7 +40,7 @@ class SetLimit extends Component {
         return (
             <div className='setLimitWrapper'>
                 <h1>
-                    Set the Limit for each category: (set -1 if no limit has to be set)
+                    Set the Limit for each category: <span className='hint'>(set -1 if no limit has to be set)</span>
                 </h1>
                 <div>
                     <div className='parentCategory'>
