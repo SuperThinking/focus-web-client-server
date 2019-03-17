@@ -7,6 +7,7 @@ var app = express();
 var crawler = require('./components/crawlerTrain');
 const currentDate = require('./components/currentDate').today;
 var convDate = require('./components/currentDate').convertDate;
+var dateAndMonth = require('./components/currentDate').dateAndMonth;
 
 const port = process.env.PORT || 5000;
 
@@ -85,7 +86,7 @@ exists = (category, id) => {
                                     }
                                 }
                             }, (err, res) => {
-                                if (err) {resolve(false); console.log('Error ' + err); }
+                                if (err) { resolve(false); console.log('Error ' + err); }
                                 else { resolve(true); }
                             });
                         }
@@ -200,13 +201,32 @@ updateTime = (category, id, timeSpent, subCategory) => {
     });
 }
 
-app.post('/api/gettime', urlencodedParser, (req, res) => {
+/*
+    id, start (in millisecs), end (in millisecs)
+*/
+app.post('/api/getuserhistory', urlencodedParser, (req, res) => {
     var id = req.body.id;
+    var startDate = req.body.start;
+    var endDate = req.body.end;
     var k = new Promise((resolve, reject) => {
-        usage_db.collection('entertainment').find({ 'user_id': id }).toArray().then(x => {
-            resolve(x[0].dates[0]);
-        })
+        usage_db.collection('entertainment').aggregate(
+            { $match: { 'user_id': id } },
+            { $unwind: '$dates' },
+            { $match: { 'dates.date': { $gte: new Date(startDate), $lt: new Date(endDate) } } },
+            { $group: { user_id: '$user_id', dates: { $push: '$dates.date' } } }).toArray().then(x => {
+                var objArray = [];
+                x.forEach(y => {
+                    var obj = {};
+                    obj['date'] = dateAndMonth(new Date(y.dates.date));
+                    console.log(y.dates.date);
+                    obj['limits'] = [y.dates.gaming.limit, y.dates.onlinetv.limit, y.dates.socialmedia.limit];
+                    obj['used'] = [y.dates.gaming.used, y.dates.onlinetv.used, y.dates.socialmedia.used];
+                    objArray.push(obj);
+                });
+                resolve(objArray);
+            })
             .catch(x => {
+                console.log(x);
                 resolve({ 'message': 'Invalid user id' })
             })
     });
@@ -286,18 +306,18 @@ app.post('/api/modifylimit', urlencodedParser, (req, res) => {
     const socialmedia = parseInt(req.body.socialmedia);
     const others = parseInt(req.body.others);
     var x = new Promise((resolve, reject) => {
-        usage_db.collection('limits').find({ 'user_id': req.body.user }).toArray().then(x => {
+        usage_db.collection('limits').find({ 'user_id': req.body.id }).toArray().then(x => {
             if (x.length) {
-                usage_db.collection('limits').updateOne({ 'user_id': req.body.user }, { $set: { "gaming": gaming, 'onlinetv': onlinetv, 'socialmedia': socialmedia, 'others': others } }, (err, res) => {
+                usage_db.collection('limits').updateOne({ 'user_id': req.body.id }, { $set: { "gaming": gaming, 'onlinetv': onlinetv, 'socialmedia': socialmedia, 'others': others } }, (err, res) => {
                     if (err) {
                         console.log(err);
                         reject('Error ' + err);
                     }
                     else {
-                        usage_db.collection('entertainment').find({ 'user_id': req.body.user }).toArray().then(x => {
+                        usage_db.collection('entertainment').find({ 'user_id': req.body.id }).toArray().then(x => {
                             if (x.length) {
                                 if (x[0].dates.length && convDate(x[0].dates[0].date) === currentDate) {
-                                    usage_db.collection('entertainment').updateOne({ 'user_id': req.body.user }, { '$set': { 'dates.0.gaming.limit': gaming, 'dates.0.onlinetv.limit': onlinetv, 'dates.0.socialmedia.limit': socialmedia } }, (err, res) => {
+                                    usage_db.collection('entertainment').updateOne({ 'user_id': req.body.id }, { '$set': { 'dates.0.gaming.limit': gaming, 'dates.0.onlinetv.limit': onlinetv, 'dates.0.socialmedia.limit': socialmedia } }, (err, res) => {
                                         if (err) {
                                             console.log(err);
                                             reject('Error ' + err);
@@ -315,7 +335,7 @@ app.post('/api/modifylimit', urlencodedParser, (req, res) => {
                 });
             }
             else {
-                usage_db.collection('limits').insert({ "user_id": req.body.user, "gaming": gaming, 'onlinetv': onlinetv, 'socialmedia': socialmedia, 'others': others });
+                usage_db.collection('limits').insert({ "user_id": req.body.id, "gaming": gaming, 'onlinetv': onlinetv, 'socialmedia': socialmedia, 'others': others });
                 resolve('Limits set');
             }
         })
@@ -333,10 +353,23 @@ app.post('/api/modifylimit', urlencodedParser, (req, res) => {
         })
 });
 
-app.get('/api/test', (req, res) => {
-    res.send(
-        `<div>Hey!</div>`
-    )
+app.post('/api/getuserlimit', urlencodedParser, (req, res) => {
+    var k = new Promise((resolve, reject) => {
+        usage_db.collection('limits').find({ 'user_id': req.body.id }).toArray().then(x => {
+            if (x.length) {
+                x[0]['status'] = true;
+                resolve(x[0]);
+            }
+            else
+                resolve({ 'status': false });
+        })
+    });
+    k.then(result => {
+        res.send(result);
+    })
+        .catch(err => {
+            console.log(err);
+        });
 })
 
 app.get('/*', (req, res) => {

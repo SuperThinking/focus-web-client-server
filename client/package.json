@@ -9,7 +9,8 @@
     "react-dom": "^16.8.1",
     "react-router-dom": "^4.3.1",
     "react-scripts": "^2.1.5",
-    "react-toastify": "^4.5.2"
+    "react-toastify": "^4.5.2",
+    "recharts": "^1.5.0"
   },
   "proxy": "http://localhost:5000/",
   "scripts": {
