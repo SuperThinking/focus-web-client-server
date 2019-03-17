@@ -6,7 +6,11 @@ class UserHistory extends Component {
     state = {
         startDate: '',
         endDate: '',
-        data: [{ date: "2019-03-15T05:10:12.850Z", limits: 60, used: 60 }, { date: "2019-03-13T18:30:00.000Z", limits: 60, used: 15 }]
+        gamingData: [],
+        tvData: [],
+        socialData: [],
+        productiveData: [],
+        othersData: []
     }
     handleChange = e => this.setState({ [e.target.name]: e.target.value });
     onClick = e => {
@@ -17,18 +21,25 @@ class UserHistory extends Component {
             'end': new Date(this.state.endDate).getTime()
         }
         Axios.post('/api/getuserhistory', data).then((response) => {
-            console.log(response);
-            this.setState({ data: response.data })
+            console.log(response.data);
+            this.setState({
+                gamingData: response.data.data['gaming'],
+                tvData: response.data.data['onlinetv'],
+                socialData: response.data.data['socialmedia'],
+                productiveData: response.data.data['productivity'],
+                othersData: response.data.data['others'] 
+            })
         })
     }
     render() {
-        const data = this.state.data;
+        const data = this.state.gamingData;
         return (
-            <div>
+            <div className='setHistoryWrapper'>
+                <h1>User History</h1>
                 <input onChange={this.handleChange} name='startDate' type='date' value={this.state.startDate}></input>
                 <input onChange={this.handleChange} name='endDate' type='date' value={this.state.endDate}></input>
                 <input type='submit' onClick={this.onClick} value='Submit' />
-                <LineChart
+                {(data.length)?<LineChart
                     width={1000}
                     height={300}
                     data={data}
@@ -43,7 +54,7 @@ class UserHistory extends Component {
                     <Legend />
                     <Line type="monotone" dataKey="limits" stroke="#8884d8" activeDot={{ r: 8 }} />
                     <Line type="monotone" dataKey="used" stroke="#82ca9d" />
-                </LineChart>
+                </LineChart>:<div>Choose the starting and ending dates</div>}
             </div>
         )
     }

@@ -205,24 +205,34 @@ updateTime = (category, id, timeSpent, subCategory) => {
     id, start (in millisecs), end (in millisecs)
 */
 app.post('/api/getuserhistory', urlencodedParser, (req, res) => {
+    var data = {};
     var id = req.body.id;
-    var startDate = req.body.start;
-    var endDate = req.body.end;
-    var k = new Promise((resolve, reject) => {
-        usage_db.collection('entertainment').aggregate(
+    var startDate, endDate;
+    if (req.body.today === undefined) {
+        startDate = req.body.start;
+        endDate = req.body.end;
+    }
+    else {
+        var startDate = new Date();
+        var endDate = new Date();
+        startDate.setDate(startDate.getDate() - 1);
+    }
+    var pro = new Promise((resolve, reject) => {
+        usage_db.collection('productivity').aggregate(
             { $match: { 'user_id': id } },
             { $unwind: '$dates' },
             { $match: { 'dates.date': { $gte: new Date(startDate), $lt: new Date(endDate) } } },
             { $group: { user_id: '$user_id', dates: { $push: '$dates.date' } } }).toArray().then(x => {
                 var objArray = [];
-                x.forEach(y => {
-                    var obj = {};
-                    obj['date'] = dateAndMonth(new Date(y.dates.date));
-                    console.log(y.dates.date);
-                    obj['limits'] = [y.dates.gaming.limit, y.dates.onlinetv.limit, y.dates.socialmedia.limit];
-                    obj['used'] = [y.dates.gaming.used, y.dates.onlinetv.used, y.dates.socialmedia.used];
-                    objArray.push(obj);
-                });
+                if (x.length) {
+                    x.forEach(y => {
+                        var obj = {};
+                        obj['date'] = dateAndMonth(new Date(y.dates.date));
+                        obj['used'] = y.dates.productiveTime.time;
+                        objArray.push(obj);
+                    });
+                    data['productivity'] = objArray;
+                }
                 resolve(objArray);
             })
             .catch(x => {
@@ -231,8 +241,77 @@ app.post('/api/getuserhistory', urlencodedParser, (req, res) => {
             })
     });
 
-    k.then(result => {
-        res.send(result);
+    var oth = new Promise((resolve, reject) => {
+        usage_db.collection('others').aggregate(
+            { $match: { 'user_id': id } },
+            { $unwind: '$dates' },
+            { $match: { 'dates.date': { $gte: new Date(startDate), $lt: new Date(endDate) } } },
+            { $group: { user_id: '$user_id', dates: { $push: '$dates.date' } } }).toArray().then(x => {
+                var objArray = [];
+                if (x.length) {
+                    x.forEach(y => {
+                        var obj = {};
+                        obj['date'] = dateAndMonth(new Date(y.dates.date));
+                        obj['limits'] = y.dates.others.limit;
+                        obj['used'] = y.dates.others.used;
+                        objArray.push(obj);
+                    });
+                    data['others'] = objArray;
+                }
+                resolve(objArray);
+            })
+            .catch(x => {
+                console.log(x);
+                resolve({ 'message': 'Invalid user id' })
+            })
+    });
+
+    var ent = new Promise((resolve, reject) => {
+        usage_db.collection('entertainment').aggregate(
+            { $match: { 'user_id': id } },
+            { $unwind: '$dates' },
+            { $match: { 'dates.date': { $gte: new Date(startDate), $lt: new Date(endDate) } } },
+            { $group: { user_id: '$user_id', dates: { $push: '$dates.date' } } }).toArray().then(x => {
+                var objArray1 = [], objArray2 = [], objArray3 = [];
+                if (x.length) {
+                    x.forEach(y => {
+                        var obj1 = {}, obj2 = {}, obj3 = {};
+                        obj1['date'] = dateAndMonth(new Date(y.dates.date));
+                        obj2['date'] = dateAndMonth(new Date(y.dates.date));
+                        obj3['date'] = dateAndMonth(new Date(y.dates.date));
+                        // obj['limits'] = [y.dates.gaming.limit, y.dates.onlinetv.limit, y.dates.socialmedia.limit];
+                        // obj['used'] = [y.dates.gaming.used, y.dates.onlinetv.used, y.dates.socialmedia.used];
+                        if (y.dates.gaming.limit !== -1) {
+                            obj1['limits'] = y.dates.gaming.limit;
+                            obj1['used'] = y.dates.gaming.used;
+                        }
+                        if (y.dates.onlinetv.limit !== -1) {
+                            obj2['limits'] = y.dates.onlinetv.limit;
+                            obj2['used'] = y.dates.onlinetv.used;
+                        }
+                        if (y.dates.socialmedia.limit !== -1) {
+                            obj3['limits'] = y.dates.socialmedia.limit;
+                            obj3['used'] = y.dates.socialmedia.used;
+                        }
+                        objArray1.push(obj1);
+                        objArray2.push(obj2);
+                        objArray3.push(obj3);
+                    });
+                    data['gaming'] = objArray1;
+                    data['onlinetv'] = objArray2;
+                    data['socialmedia'] = objArray3;
+                }
+                resolve([objArray1, objArray2, objArray3]);
+            })
+            .catch(x => {
+                console.log(x);
+                resolve({ 'message': 'Invalid user id' })
+            })
+    });
+
+    Promise.all([pro, oth, ent]).then(x => {
+        console.log(x);
+        res.send({ 'data': data });
     })
 })
 

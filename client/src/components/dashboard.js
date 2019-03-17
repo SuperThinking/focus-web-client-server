@@ -7,7 +7,7 @@ import QuotaLeft from './dashboard_items/quotaleft';
 const options = {
     "Set Limits": 0,
     "History": 1,
-    "Today's Quota": 2
+    "Quota Left": 2
 };
 
 class Dashboard extends Component {
@@ -21,7 +21,7 @@ class Dashboard extends Component {
 
     render() {
         var dashboardItems = Object.keys(options).map(x => {
-            return <div onClick={this.handleClick} key={options[x]} className='DheaderItems'><button className='dItems'>{x}</button></div>
+            return <div onClick={this.handleClick} key={options[x]} className='DheaderItems dItems'>{x}</div>
         });
         const currentComponent = [<SetLimit unique_id={this.props.unique_id} />, <UserHistory unique_id={this.props.unique_id} />, <QuotaLeft unique_id={this.props.unique_id} />];
 
@@ -29,7 +29,7 @@ class Dashboard extends Component {
             <div className='mainDashboard'>
                 <div className='dashboardHeader'>
                     {/* <div className='DheaderItems'><h2>DASHBOARD</h2></div> */}
-                    <div className='DheaderItems'><h2>{this.props.unique_id}</h2></div>
+                    <div className='DheaderItems idHeaderItem'><h2 className='idDisplay'>{this.props.unique_id}</h2></div>
                     {dashboardItems}
                 </div>
                 <div className='dashboardBody'>

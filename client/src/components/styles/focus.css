@@ -15,6 +15,8 @@
 
 .rightPanel{
     text-align: center;
+    justify-content: center;
+    align-items: center;
 }
 
 .extensionApp{
@@ -99,5 +101,11 @@
     }
     .extensionImg{
         width: 75%;
+    }
+    .inputInfo{
+        font-size: 25px;
+    }
+    .loginInput{
+        font-size: 25px;
     }
 }
