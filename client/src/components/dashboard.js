@@ -16,12 +16,12 @@ class Dashboard extends Component {
         index: 0
     }
     handleClick = e => {
-        this.setState({ index: options[e.target.innerHTML] });
+        this.setState({ index: options[e.target.innerHTML]});
     }
 
     render() {
         var dashboardItems = Object.keys(options).map(x => {
-            return <div onClick={this.handleClick} key={options[x]} className='DheaderItems dItems'>{x}</div>
+            return <div onClick={this.handleClick} key={options[x]} className={(options[x]===this.state.index)?'DheaderItems dItems selectedItem':'DheaderItems dItems'}>{x}</div>
         });
         const currentComponent = [<SetLimit unique_id={this.props.unique_id} />, <UserHistory unique_id={this.props.unique_id} />, <QuotaLeft unique_id={this.props.unique_id} />];
 

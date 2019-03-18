@@ -26,15 +26,14 @@
     outline: none;
     color: #EDF5E1;
     background-color: transparent;
-    border-style: ridge;
-    border-color: #05386B;
+    border: none;
     font-size: 30px;
     font-family: 'Raleway', sans-serif;
 }
 
 .dItems:hover {
     cursor: pointer;
-    background-color: #05386B;
+    /* background-color: #05386B; */
 }
 
 .setLimitWrapper, .setHistoryWrapper, .quotaWrapper {
@@ -103,6 +102,11 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover,input[type="date"]::
 
 .historyHeader:hover{
     cursor: pointer;
+}
+
+.selectedItem{
+    border-top-style: ridge;
+    border-color: rgb(211, 110, 110);
 }
 
 @media (max-width: 767px) {
