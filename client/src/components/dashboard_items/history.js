@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import Axios from 'axios';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
+import HistoryItem from './historyItem';
 
 class UserHistory extends Component {
     state = {
@@ -32,34 +32,20 @@ class UserHistory extends Component {
         })
     }
     render() {
-        const data = [["Gaming", this.state.gamingData],
-        ["Online TV", this.state.tvData],
-        ["Social Media", this.state.socialData],
-        ["Others", this.state.othersData]
+        const data = [
+            ["Gaming", this.state.gamingData],
+            ["Online TV", this.state.tvData],
+            ["Social Media", this.state.socialData],
+            ["Others", this.state.othersData]
         ];
         var graphs = data.map(x => {
             if (x.length && x[1].length) {
                 return (
-                    <div key={x[0]}>
-                        <h2>{x[0]}</h2>
-                        <LineChart
-                            width={1000}
-                            height={300}
-                            data={x[1]}
-                            margin={{
-                                top: 5, right: 30, left: 20, bottom: 5,
-                            }}
-                        >
-                            <CartesianGrid strokeDasharray="3 3" />
-                            <XAxis dataKey="date" />
-                            <YAxis />
-                            <Tooltip />
-                            <Legend />
-                            <Line type="monotone" dataKey="limit" stroke="#c72a2a" activeDot={{ r: 8 }} />
-                            <Line type="monotone" dataKey="used" stroke="#3d5fbb" />
-                        </LineChart>
-                    </div>
+                    <HistoryItem x={x} />
                 )
+            }
+            else {
+                return (null);
             }
         })
         return (
@@ -71,7 +57,7 @@ class UserHistory extends Component {
                         <tr>
                             <td><input className='dateInput' onChange={this.handleChange} name='startDate' type='date' value={this.state.startDate}></input></td>
                             <td><input className='dateInput' onChange={this.handleChange} name='endDate' type='date' value={this.state.endDate}></input></td>
-                            <td><input type='submit' onClick={this.onClick} value='Submit' className='getHistoryButton'/></td>
+                            <td><input type='submit' onClick={this.onClick} value='Submit' className='getHistoryButton' /></td>
                         </tr>
                     </tbody>
                 </table>

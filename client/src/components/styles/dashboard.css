@@ -101,6 +101,10 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover,input[type="date"]::
     font-size: 20px;
 }
 
+.historyHeader:hover{
+    cursor: pointer;
+}
+
 @media (max-width: 767px) {
     .hint {
         text-align: center;

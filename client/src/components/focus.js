@@ -11,7 +11,7 @@ class FOCUS extends Component {
                 <h1>PRODUCTIVITY</h1>
             </div>
             <div className='rightPanel panel'>
-                {this.props.p.location==='initial'?<ExtensionApp />:this.props.p.location==='login'?<Login p={this.props.p}/>:<Signup/>}
+                {this.props.p.location==='initial'?<ExtensionApp />:this.props.p.location==='login'?<Login p={this.props.p}/>:<Signup location={this.props.p.internalRouting}/>}
             </div>
         </div>)
     }

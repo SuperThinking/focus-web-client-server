@@ -13,13 +13,14 @@ class App extends Component {
     this.state = {
       isAuthenticated: false,
       unique_id: "",
+      username: "",
       location: "initial"
     };
   }
 
-  userHasAuthenticated = (authenticated, unique_id) => {
+  userHasAuthenticated = (authenticated, unique_id, username) => {
     if (authenticated) {
-      this.setState({ isAuthenticated: authenticated, unique_id: unique_id });
+      this.setState({ isAuthenticated: authenticated, unique_id: unique_id, username: username });
       localStorage.setItem('user_session_key', unique_id);
     }
     else
@@ -38,7 +39,6 @@ class App extends Component {
   }
 
   internalRouting = (x) => {
-    console.log(x);
     this.setState({location:x});
   }
 
@@ -47,7 +47,9 @@ class App extends Component {
       isAuthenticated: this.state.isAuthenticated,
       userHasAuthenticated: this.userHasAuthenticated,
       unique_id: this.state.unique_id,
-      location:this.state.location
+      username: this.state.username,
+      location:this.state.location,
+      internalRouting:this.internalRouting
     };
     const navProps = {
       isAuthenticated: this.state.isAuthenticated,

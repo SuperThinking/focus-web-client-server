@@ -74,7 +74,7 @@ class SetLimit extends Component {
                 </div>
                 <div>
                     <div className='parentCategory'>
-                        <h2>Others (e.g. E-Commerce)</h2>
+                        <h2>Others <span className='hint'>(e.g. E-Commerce)</span></h2>
                         <table>
                             <tbody>
                                 <tr>

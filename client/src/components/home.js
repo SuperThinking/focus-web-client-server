@@ -5,7 +5,7 @@ import Dashboard from './dashboard';
 class Home extends Component {
     render() {
         return (<div>
-            {this.props.isAuthenticated?<Dashboard unique_id={this.props.unique_id}/>:<FOCUS p={this.props}/>}
+            {this.props.isAuthenticated?<Dashboard username={this.props.username} unique_id={this.props.unique_id}/>:<FOCUS p={this.props}/>}
         </div>)
     }
 }

@@ -20,10 +20,10 @@ class Login extends Component {
             "password": this.state.password
         }
         try {
-            Axios.post("/api/login", data).then(response => {
-                if (response.data.status === "true") {
+            Axios.post('https://focususermanagement.herokuapp.com/somethingLogin/', data).then(response => {
+                if (response.data.error === undefined) {
                     console.log(response);
-                    this.props.p.userHasAuthenticated(true, response.data.unique_id);
+                    this.props.p.userHasAuthenticated(true, response.data[0]['_profile__uid'], response.data[0]['username']);
                     this.props.p.history.push("/");
                 }
                 else {

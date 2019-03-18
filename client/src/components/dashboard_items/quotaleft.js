@@ -29,7 +29,7 @@ class QuotaLeft extends Component {
             <div className='quotaWrapper'>
                 <h1>Quota Left</h1>
                 <div>
-                    {timeLeftMessage}
+                    <h2>{timeLeftMessage}</h2>
                 </div>
             </div>
         )
