@@ -1,4 +1,5 @@
-.mainNavBar{
+.mainNavBar {
+    z-index: 20;
     margin: 0 0 0 0;
     position: fixed;
     background-color: #0B0C10;
@@ -9,42 +10,66 @@
     align-content: center;
     flex-grow: 100px;
 }
-.webHeading{
+
+.webHeading {
     margin-left: 5px;
     flex-basis: 30%;
 }
-.webHeadingText:hover{
+
+.webHeadingText:hover {
     cursor: pointer;
     animation: shake 1.0s;
     animation-iteration-count: infinite;
 }
+
 @keyframes shake {
-  0% { transform: translate(1px, 1px) rotate(0deg); }
-  10% { transform: translate(-1px, -2px) rotate(-1deg); }
-  20% { transform: translate(-3px, 0px) rotate(1deg); }
-  30% { transform: translate(3px, 2px) rotate(0deg); }
-  40% { transform: translate(1px, -1px) rotate(1deg); }
-  50% { transform: translate(-1px, 2px) rotate(-1deg); }
-  60% { transform: translate(-3px, 1px) rotate(0deg); }
-  70% { transform: translate(3px, 1px) rotate(-1deg); }
-  80% { transform: translate(-1px, -1px) rotate(1deg); }
-  90% { transform: translate(1px, 2px) rotate(0deg); }
-  100% { transform: translate(1px, -2px) rotate(-1deg); }
+    0% {
+        transform: translate(1px, 1px) rotate(0deg);
+    }
+    10% {
+        transform: translate(-1px, -2px) rotate(-1deg);
+    }
+    20% {
+        transform: translate(-3px, 0px) rotate(1deg);
+    }
+    30% {
+        transform: translate(3px, 2px) rotate(0deg);
+    }
+    40% {
+        transform: translate(1px, -1px) rotate(1deg);
+    }
+    50% {
+        transform: translate(-1px, 2px) rotate(-1deg);
+    }
+    60% {
+        transform: translate(-3px, 1px) rotate(0deg);
+    }
+    70% {
+        transform: translate(3px, 1px) rotate(-1deg);
+    }
+    80% {
+        transform: translate(-1px, -1px) rotate(1deg);
+    }
+    90% {
+        transform: translate(1px, 2px) rotate(0deg);
+    }
+    100% {
+        transform: translate(1px, -2px) rotate(-1deg);
+    }
 }
 
-.loginSignup{
+.loginSignup {
     flex-basis: 70%;
     display: flex;
     flex-direction: row-reverse;
     align-items: center;
 }
-.navButtons{
+
+.navButtons {
     position: relative;
     overflow: hidden;
-
     text-align: center;
     font-size: 1.5em;
-
     outline: none;
     margin-right: 10px;
     border-style: ridge;
@@ -52,21 +77,18 @@
     border-top-right-radius: 1px;
     border-bottom-left-radius: 1px;
     border-bottom-right-radius: 10px;
-
     min-height: max-content;
     max-height: 50px;
-
     color: #AAABB8;
     border-color: #66FCF1;
     background-color: transparent;
-
-    transition:         0.208s ease-in;
-    -o-transition:      0.208s ease-in;
-    -ms-transition:     0.208s ease-in;
-    -moz-transition:    0.208s ease-in;
+    transition: 0.208s ease-in;
+    -o-transition: 0.208s ease-in;
+    -ms-transition: 0.208s ease-in;
+    -moz-transition: 0.208s ease-in;
     -webkit-transition: 0.208s ease-in;
 }
-.navButtons:hover{
+.navButtons:hover {
     outline: none;
     cursor: pointer;
     color: #0B0C10;
@@ -83,8 +105,8 @@
     top: 100%;
     z-index: -1;
     -webkit-transition: top 0.19s ease-in;
-  }
-  
-  .navButtons:hover:before {
+}
+
+.navButtons:hover:before {
     top: 0;
-  }
+}

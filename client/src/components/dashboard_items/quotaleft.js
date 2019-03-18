@@ -17,12 +17,11 @@ class QuotaLeft extends Component {
     }
     render() {
         var timeLeftMessage = Object.keys(this.state.data).map(x => {
-            console.log(this.state.data[x][0]);
-            if ('limits' in this.state.data[x][0]) {
-                return <div>{(this.state.data[x][0].limits - this.state.data[x][0].used)} minutes left for {x}</div>;
+            if ('limit' in this.state.data[x][0]) {
+                return <div key={x}>{(this.state.data[x][0].limit - this.state.data[x][0].used)} minutes left for {x}</div>;
             }
             else {
-                return <div>{(this.state.data[x][0].used)} minutes spent in Productivity</div>;
+                return <div key={x}>{(this.state.data[x][0].used)} minutes spent in Productivity</div>;
             }
         });
         // var timeLeftMessage = "asd";

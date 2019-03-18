@@ -32,7 +32,7 @@ exists = (category, id) => {
     var subCats = {};
 
     subCats['entertainment'] = {
-        "date": new Date(),
+        "date": new Date(currentDate),
         "gaming": {
             "limit": -1,
             "used": 0
@@ -48,14 +48,14 @@ exists = (category, id) => {
     };
 
     subCats['productivity'] = {
-        "date": new Date(),
+        "date": new Date(currentDate),
         "productiveTime": {
             "time": 0
         }
     }
 
     subCats['others'] = {
-        "date": new Date(),
+        "date": new Date(currentDate),
         "others": {
             "limit": -1,
             "used": 0
@@ -117,7 +117,7 @@ upsertTime = (category, id, timeSpent, subCategory) => {
     var subCats = {};
 
     subCats['entertainment'] = {
-        "date": new Date(),
+        "date": new Date(currentDate),
         "gaming": {
             "limit": -1,
             "used": 0
@@ -133,14 +133,14 @@ upsertTime = (category, id, timeSpent, subCategory) => {
     };
 
     subCats['productivity'] = {
-        "date": new Date(),
+        "date": new Date(currentDate),
         "productiveTime": {
             "time": 0
         }
     }
 
     subCats['others'] = {
-        "date": new Date(),
+        "date": new Date(currentDate),
         "others": {
             "limit": -1,
             "used": 0
@@ -208,20 +208,26 @@ app.post('/api/getuserhistory', urlencodedParser, (req, res) => {
     var data = {};
     var id = req.body.id;
     var startDate, endDate;
+    var condition = {}
     if (req.body.today === undefined) {
         startDate = req.body.start;
         endDate = req.body.end;
+        condition = {
+            'dates.date': {
+                '$gte': new Date(startDate), '$lt': new Date(endDate)
+            }
+        }
     }
     else {
-        var startDate = new Date();
-        var endDate = new Date();
-        startDate.setDate(startDate.getDate() - 1);
+        condition = {
+            'dates.date': new Date(currentDate)
+        }
     }
     var pro = new Promise((resolve, reject) => {
         usage_db.collection('productivity').aggregate(
             { $match: { 'user_id': id } },
             { $unwind: '$dates' },
-            { $match: { 'dates.date': { $gte: new Date(startDate), $lt: new Date(endDate) } } },
+            { $match: condition },
             { $group: { user_id: '$user_id', dates: { $push: '$dates.date' } } }).toArray().then(x => {
                 var objArray = [];
                 if (x.length) {
@@ -245,16 +251,18 @@ app.post('/api/getuserhistory', urlencodedParser, (req, res) => {
         usage_db.collection('others').aggregate(
             { $match: { 'user_id': id } },
             { $unwind: '$dates' },
-            { $match: { 'dates.date': { $gte: new Date(startDate), $lt: new Date(endDate) } } },
+            { $match: condition },
             { $group: { user_id: '$user_id', dates: { $push: '$dates.date' } } }).toArray().then(x => {
                 var objArray = [];
                 if (x.length) {
                     x.forEach(y => {
-                        var obj = {};
-                        obj['date'] = dateAndMonth(new Date(y.dates.date));
-                        obj['limits'] = y.dates.others.limit;
-                        obj['used'] = y.dates.others.used;
-                        objArray.push(obj);
+                        if (y.dates.others.limit !== -1) {
+                            var obj = {};
+                            obj['date'] = dateAndMonth(new Date(y.dates.date));
+                            obj['limit'] = y.dates.others.limit;
+                            obj['used'] = y.dates.others.used;
+                            objArray.push(obj);
+                        }
                     });
                     data['others'] = objArray;
                 }
@@ -270,7 +278,7 @@ app.post('/api/getuserhistory', urlencodedParser, (req, res) => {
         usage_db.collection('entertainment').aggregate(
             { $match: { 'user_id': id } },
             { $unwind: '$dates' },
-            { $match: { 'dates.date': { $gte: new Date(startDate), $lt: new Date(endDate) } } },
+            { $match: condition },
             { $group: { user_id: '$user_id', dates: { $push: '$dates.date' } } }).toArray().then(x => {
                 var objArray1 = [], objArray2 = [], objArray3 = [];
                 if (x.length) {
@@ -282,15 +290,15 @@ app.post('/api/getuserhistory', urlencodedParser, (req, res) => {
                         // obj['limits'] = [y.dates.gaming.limit, y.dates.onlinetv.limit, y.dates.socialmedia.limit];
                         // obj['used'] = [y.dates.gaming.used, y.dates.onlinetv.used, y.dates.socialmedia.used];
                         if (y.dates.gaming.limit !== -1) {
-                            obj1['limits'] = y.dates.gaming.limit;
+                            obj1['limit'] = y.dates.gaming.limit;
                             obj1['used'] = y.dates.gaming.used;
                         }
                         if (y.dates.onlinetv.limit !== -1) {
-                            obj2['limits'] = y.dates.onlinetv.limit;
+                            obj2['limit'] = y.dates.onlinetv.limit;
                             obj2['used'] = y.dates.onlinetv.used;
                         }
                         if (y.dates.socialmedia.limit !== -1) {
-                            obj3['limits'] = y.dates.socialmedia.limit;
+                            obj3['limit'] = y.dates.socialmedia.limit;
                             obj3['used'] = y.dates.socialmedia.used;
                         }
                         objArray1.push(obj1);

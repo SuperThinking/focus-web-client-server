@@ -17,7 +17,7 @@ class NavBar extends Component
                             <button onClick={this.handleClick} className='navButtons'>Login</button>
                         </div>;
         var logout = <div className='logout loginSignup'>
-                        <button onClick={this.handleClick} className='navButtons'>Logout</button>
+                        <button onClick={this.handleClick} className='navButtons navLogout'>Logout</button>
                     </div>
         return(<div className='mainNavBar'>
             <div className='webHeading'>
