@@ -27,8 +27,7 @@ MongoClient.connect("mongodb://user:user@focus-shard-00-00-vsbgw.mongodb.net:270
     }
 })
 
-exists = (category, id) => {
-
+exists = (category, id, subCategory, timeSpent) => {
     var subCats = {};
 
     subCats['entertainment'] = {
@@ -62,11 +61,25 @@ exists = (category, id) => {
         }
     }
 
+    var result = {};
     return new Promise((resolve, reject) => {
         usage_db.collection(category).find({ 'user_id': id }).toArray().then(x => {
             if (x.length) {
-                if (convDate(x[0].dates[0].date) === currentDate)
-                    resolve(true);
+                if (convDate(x[0].dates[0].date) === currentDate) {
+                    result['status'] = true;
+                    if (subCategory.length) {
+                        let timeLeft = x[0].dates[0][subCategory].limit - x[0].dates[0][subCategory].used - timeSpent;
+                        if (x[0].dates[0][subCategory].limit === -1)
+                            result['response'] = { subCategory: -1 };
+                        else if (timeLeft <= 0)
+                            result['response'] = { subCategory: 0 };
+                        else
+                            result['response'] = { subCategory: timeLeft };
+                    }
+                    else
+                        result['response'] = '{"productivity":-1}';
+                    resolve(result);
+                }
                 else {
                     usage_db.collection('limits').find({ 'user_id': id }).toArray().then(y => {
                         if (y.length) {
@@ -74,9 +87,23 @@ exists = (category, id) => {
                                 subCats[category].gaming.limit = parseInt(y[0].gaming);
                                 subCats[category].onlinetv.limit = parseInt(y[0].onlinetv);
                                 subCats[category].socialmedia.limit = parseInt(y[0].socialmedia);
+                                let timeLeft = y[0][subCategory] - timeSpent;
+                                if (parseInt(y[0][subCategory]) === -1)
+                                    result['response'] = { subCategory: -1 };
+                                else if (timeLeft <= 0)
+                                    result['response'] = { subCategory: 0 };
+                                else
+                                    result['response'] = { subCategory: timeLeft };
                             }
                             else if (category === 'others') {
                                 subCats[category].others.limit = parseInt(y[0].others);
+                                let timeLeft = y[0][subCategory] - timeSpent;
+                                if (parseInt(y[0][subCategory]) === -1)
+                                    result['response'] = { subCategory: -1 };
+                                else if (timeLeft <= 0)
+                                    result['response'] = { subCategory: 0 };
+                                else
+                                    result['response'] = { subCategory: timeLeft };
                             }
                             usage_db.collection(category).update({ 'user_id': id }, {
                                 '$push': {
@@ -86,11 +113,12 @@ exists = (category, id) => {
                                     }
                                 }
                             }, (err, res) => {
-                                if (err) { resolve(false); console.log('Error ' + err); }
-                                else { resolve(true); }
+                                if (err) { result['status'] = false; resolve(result); console.log('Error ' + err); }
+                                else { result['status'] = true; resolve(result); }
                             });
                         }
                         else {
+                            result['response'] = { subCategory: -1 };
                             usage_db.collection(category).update({ 'user_id': id }, {
                                 '$push': {
                                     'dates': {
@@ -99,21 +127,21 @@ exists = (category, id) => {
                                     }
                                 }
                             }, (err, res) => {
-                                if (err) { resolve(false); console.log('Error ' + err); }
-                                else { resolve(true); }
+                                if (err) { result['status'] = false; resolve(result); console.log('Error ' + err); }
+                                else { result['status'] = true; resolve(result); }
                             });
                         }
                     });
                 }
             }
             else {
-                resolve(false);
+                result['status'] = false; resolve(result);
             }
         })
     });
 }
 
-upsertTime = (category, id, timeSpent, subCategory) => {
+upsertTime = (category, id, timeSpent, subCategory, res) => {
     var subCats = {};
 
     subCats['entertainment'] = {
@@ -154,11 +182,36 @@ upsertTime = (category, id, timeSpent, subCategory) => {
                     subCats[category].gaming.limit = parseInt(y[0].gaming);
                     subCats[category].onlinetv.limit = parseInt(y[0].onlinetv);
                     subCats[category].socialmedia.limit = parseInt(y[0].socialmedia);
-                    subCats[category][subCategory].used = timeSpent;
+
+                    let timeLeft = parseInt(y[0][subCategory]) - timeSpent;
+
+                    if(timeLeft<=0)
+                        subCats[category][subCategory].used = 0;
+                    else
+                        subCats[category][subCategory].used = timeSpent;
+                    
+                    if (parseInt(y[0][subCategory]) === -1)
+                        res.send({ subCategory: -1 });
+                    else if (timeLeft <= 0)
+                        res.send({ subCategory: 0 });
+                    else
+                        res.send({ subCategory: timeLeft });
                 }
                 else if (category === 'others') {
                     subCats[category].others.limit = parseInt(y[0].others);
-                    subCats[category][subCategory].used = timeSpent;
+                    let timeLeft = parseInt(y[0][subCategory]) - timeSpent;
+
+                    if(timeLeft<=0)
+                        subCats[category][subCategory].used = 0;
+                    else
+                        subCats[category][subCategory].used = timeSpent;
+                        
+                    if (parseInt(y[0][subCategory]) === -1)
+                        res.send({ subCategory: -1 });
+                    else if (timeLeft <= 0)
+                        res.send({ subCategory: 0 });
+                    else
+                        res.send({ subCategory: timeLeft });
                 }
                 else {
                     subCats[category].productiveTime.time = timeSpent;
@@ -168,6 +221,7 @@ upsertTime = (category, id, timeSpent, subCategory) => {
                 })
             }
             else {
+                res.send({subCategory:-1});
                 usage_db.collection(category).update({ 'user_id': id }, {
                     '$push': {
                         'dates': {
@@ -184,6 +238,7 @@ upsertTime = (category, id, timeSpent, subCategory) => {
     });
 
     return k.then(res => {
+
         return (res);
     })
 
@@ -200,6 +255,70 @@ updateTime = (category, id, timeSpent, subCategory) => {
         if (err) console.log('Error ' + err);
     });
 }
+
+app.post('/api/insert2', urlencodedParser, (req, res) => {
+    let id = req.body.id;
+    let category = req.body.category;
+    let timeSpent = parseInt(req.body.timeSpent);
+    if (category === 'gaming' || category === 'onlinetv' || category === 'socialmedia') {
+        exists('entertainment', id, category, timeSpent).then(result => {
+            if (result.status) {
+                res.send(result.response);
+                updateTime('entertainment', id, timeSpent, category);
+            }
+            else {
+                upsertTime('entertainment', id, timeSpent, category, res);
+            }
+        });
+    }
+    else if (category === 'productivity') {
+        exists('productivity', id, "", timeSpent).then(result => {
+            res.send({ 'productivity': -1 });
+            if (result.status)
+                updateTime('productivity', id, timeSpent, null);
+            else
+                upsertTime('productivity', id, timeSpent, null);
+        });
+    }
+    else {
+        exists('others', id, 'others', timeSpent).then(result => {
+            if (result.status)
+            {
+                res.send(result.response);
+                updateTime('others', id, timeSpent, 'others');
+            }
+            else
+                upsertTime('others', id, timeSpent, 'others', res);
+        });
+    }
+})
+
+/*
+    {url:"www.url.com"}
+*/
+app.post('/api/getcategory', urlencodedParser, (req, res) => {
+    let url = req.body.url;
+    axios(url).then(response => {
+        var x = new Promise((resolve, reject) => {
+            // resolve(parseClassify.findCategory(url));
+            resolve(crawler.getCategory(url));
+        });
+
+        // Adds URL Category to MongoDB
+        x.then((category) => {
+            res.send(`{"msg":"${category}", "status":"${true}"}`);
+        })
+            .catch(error => {
+                console.log(error);
+                res.send(`{"msg":"Unable to parse the URL", "status":"${false}"}`);
+            })
+
+    })
+        .catch(error => {
+            console.log(error);
+            res.send(`{"msg":"Unable to reach the URL", "status":"${false}"}`);
+        })
+})
 
 /*
     id, start (in millisecs), end (in millisecs)
@@ -293,22 +412,25 @@ app.post('/api/getuserhistory', urlencodedParser, (req, res) => {
                         if (y.dates.gaming.limit !== -1) {
                             obj1['limit'] = y.dates.gaming.limit;
                             obj1['used'] = y.dates.gaming.used;
+                            objArray1.push(obj1);
                         }
                         if (y.dates.onlinetv.limit !== -1) {
                             obj2['limit'] = y.dates.onlinetv.limit;
                             obj2['used'] = y.dates.onlinetv.used;
+                            objArray2.push(obj2);
                         }
                         if (y.dates.socialmedia.limit !== -1) {
                             obj3['limit'] = y.dates.socialmedia.limit;
                             obj3['used'] = y.dates.socialmedia.used;
+                            objArray3.push(obj3);
                         }
-                        objArray1.push(obj1);
-                        objArray2.push(obj2);
-                        objArray3.push(obj3);
+                        // objArray1.push(obj1);
+                        // objArray2.push(obj2);
+                        // objArray3.push(obj3);
                     });
-                    data['gaming'] = objArray1;
-                    data['onlinetv'] = objArray2;
-                    data['socialmedia'] = objArray3;
+                    if(objArray1.length) data['gaming'] = objArray1;
+                    if(objArray2.length) data['onlinetv'] = objArray2;
+                    if(objArray3.length) data['socialmedia'] = objArray3;
                 }
                 resolve([objArray1, objArray2, objArray3]);
             })
@@ -345,7 +467,7 @@ app.post('/api/insert', urlencodedParser, (req, res) => {
             let timeSpent = parseInt(urls[i].timeSpent);
             console.log(i, url);
             axios(url).then(response => {
-                console.log("INSIDE=> "+url);
+                console.log("INSIDE=> " + url);
                 var x = new Promise((resolve, reject) => {
                     // resolve(parseClassify.findCategory(url));
                     resolve(crawler.getCategory(url));
