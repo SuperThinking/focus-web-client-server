@@ -203,13 +203,14 @@ updateTime = (category, id, timeSpent, subCategory) => {
 
 /*
     id, start (in millisecs), end (in millisecs)
+    for today's usage => id, today:true
 */
 app.post('/api/getuserhistory', urlencodedParser, (req, res) => {
     var data = {};
     var id = req.body.id;
     var startDate, endDate;
     var condition = {}
-    if (req.body.today === undefined) {
+    if (req.body.today === undefined || !req.body.today) {
         startDate = req.body.start;
         endDate = req.body.end;
         condition = {
@@ -323,51 +324,69 @@ app.post('/api/getuserhistory', urlencodedParser, (req, res) => {
     })
 })
 
+/* 
+    {
+        id:"USER ID",
+        urls:[
+            {url:"www.URL1.com", timeSpent:40},
+            {url:"www.URL2.com", timeSpent:50},
+            {url:"www.URL3.com", timeSpent:60},
+        ]
+    }
+*/
 app.post('/api/insert', urlencodedParser, (req, res) => {
-    var url = req.body.url;
+    var urls = req.body.urls;
     var id = req.body.id;
-    var timeSpent = parseInt(req.body.timeSpent);
-    if (id !== undefined && url !== undefined && timeSpent !== undefined) {
-        axios(url).then(response => {
-            var x = new Promise((resolve, reject) => {
-                // resolve(parseClassify.findCategory(url));
-                resolve(crawler.getCategory(url));
-            });
+    if (id !== undefined && urls.length) {
+        res.contentType('application/json');
+        res.send(`{"message":"Urls sent for processing"}`);
+        for (let i in urls) {
+            let url = urls[i].url;
+            let timeSpent = parseInt(urls[i].timeSpent);
+            console.log(i, url);
+            axios(url).then(response => {
+                console.log("INSIDE=> "+url);
+                var x = new Promise((resolve, reject) => {
+                    // resolve(parseClassify.findCategory(url));
+                    resolve(crawler.getCategory(url));
+                });
 
-            // Adds URL Category to MongoDB
-            x.then((category) => {
-                if (category === 'gaming' || category === 'onlinetv' || category === 'socialmedia') {
-                    exists('entertainment', id).then(result => {
-                        if (result)
-                            updateTime('entertainment', id, timeSpent, category);
-                        else
-                            upsertTime('entertainment', id, timeSpent, category);
-                    });
-                }
-                else if (category === 'productivity') {
-                    exists('productivity', id).then(result => {
-                        if (result)
-                            updateTime('productivity', id, timeSpent, null);
-                        else
-                            upsertTime('productivity', id, timeSpent, null);
-                    });
-                }
-                else {
-                    exists('others', id).then(result => {
-                        if (result)
-                            updateTime('others', id, timeSpent, 'others');
-                        else
-                            upsertTime('others', id, timeSpent, 'others');
-                    });
-                }
+                // Adds URL Category to MongoDB
+                x.then((category) => {
+                    if (category === 'gaming' || category === 'onlinetv' || category === 'socialmedia') {
+                        exists('entertainment', id).then(result => {
+                            if (result)
+                                updateTime('entertainment', id, timeSpent, category);
+                            else
+                                upsertTime('entertainment', id, timeSpent, category);
+                        });
+                    }
+                    else if (category === 'productivity') {
+                        exists('productivity', id).then(result => {
+                            if (result)
+                                updateTime('productivity', id, timeSpent, null);
+                            else
+                                upsertTime('productivity', id, timeSpent, null);
+                        });
+                    }
+                    else {
+                        exists('others', id).then(result => {
+                            if (result)
+                                updateTime('others', id, timeSpent, 'others');
+                            else
+                                upsertTime('others', id, timeSpent, 'others');
+                        });
+                    }
+                })
+                // res.contentType('application/json');
+                // res.send(`{"message":"URL : ${url} added"}`);
             })
-            res.contentType('application/json');
-            res.send(`{"message":"URL : ${url} added"}`);
-        })
-            .catch(error => {
-                res.contentType('application/json');
-                res.send('{"message":"Unable to reach URL"}');
-            })
+                .catch(error => {
+                    console.log(error);
+                    // res.contentType('application/json');
+                    // res.send('{"message":"Unable to reach URL"}');
+                })
+        }
     }
     else {
         res.send('{"message":"Error : Missing Unique ID/URL"}')
