@@ -32,13 +32,13 @@ class HistoryItem extends Component {
                             top: 5, right: 30, left: 20, bottom: 5,
                         }}
                     >
-                        <CartesianGrid strokeDasharray="3 3" />
+                        <CartesianGrid strokeDasharray="5 5" />
                         <XAxis dataKey="date" />
                         <YAxis />
                         <Tooltip />
                         <Legend />
-                        <Line type="monotone" dataKey="limit" stroke="#c72a2a" activeDot={{ r: 8 }} />
-                        <Line type="monotone" dataKey="used" stroke="#3d5fbb" />
+                        <Line strokeWidth="2" type="monotone" dataKey="limit" stroke="#c72a2a" activeDot={{ r: 8 }} />
+                        <Line strokeWidth="2" type="monotone" dataKey="used" stroke="#3d5fbb" />
                     </LineChart>
                 </div>
             </div>
