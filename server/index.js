@@ -69,12 +69,14 @@ exists = (category, id, subCategory, timeSpent) => {
                     result['status'] = true;
                     if (subCategory.length) {
                         let timeLeft = x[0].dates[0][subCategory].limit - x[0].dates[0][subCategory].used - timeSpent;
+                        let tempObj = {}
                         if (x[0].dates[0][subCategory].limit === -1)
-                            result['response'] = { subCategory: -1 };
+                            tempObj[subCategory] = -1;
                         else if (timeLeft <= 0)
-                            result['response'] = { subCategory: 0 };
+                            tempObj[subCategory] = 0;
                         else
-                            result['response'] = { subCategory: timeLeft };
+                            tempObj[subCategory] = timeLeft;
+                        result['response'] = tempObj;
                     }
                     else
                         result['response'] = '{"productivity":-1}';
@@ -88,22 +90,25 @@ exists = (category, id, subCategory, timeSpent) => {
                                 subCats[category].onlinetv.limit = parseInt(y[0].onlinetv);
                                 subCats[category].socialmedia.limit = parseInt(y[0].socialmedia);
                                 let timeLeft = y[0][subCategory] - timeSpent;
+                                let tempObj = {}
                                 if (parseInt(y[0][subCategory]) === -1)
-                                    result['response'] = { subCategory: -1 };
+                                    tempObj[subCategory] = -1;
                                 else if (timeLeft <= 0)
-                                    result['response'] = { subCategory: 0 };
+                                    tempObj[subCategory] = 0;
                                 else
-                                    result['response'] = { subCategory: timeLeft };
+                                    tempObj[subCategory] = timeLeft;
+                                result['response'] = tempObj;
                             }
                             else if (category === 'others') {
                                 subCats[category].others.limit = parseInt(y[0].others);
-                                let timeLeft = y[0][subCategory] - timeSpent;
+                                let tempObj = {}
                                 if (parseInt(y[0][subCategory]) === -1)
-                                    result['response'] = { subCategory: -1 };
+                                    tempObj[subCategory] = -1;
                                 else if (timeLeft <= 0)
-                                    result['response'] = { subCategory: 0 };
+                                    tempObj[subCategory] = 0;
                                 else
-                                    result['response'] = { subCategory: timeLeft };
+                                    tempObj[subCategory] = timeLeft;
+                                result['response'] = tempObj;
                             }
                             usage_db.collection(category).update({ 'user_id': id }, {
                                 '$push': {
@@ -185,11 +190,11 @@ upsertTime = (category, id, timeSpent, subCategory, res) => {
 
                     let timeLeft = parseInt(y[0][subCategory]) - timeSpent;
 
-                    if(timeLeft<=0)
+                    if (timeLeft <= 0)
                         subCats[category][subCategory].used = 0;
                     else
                         subCats[category][subCategory].used = timeSpent;
-                    
+
                     if (parseInt(y[0][subCategory]) === -1)
                         res.send({ subCategory: -1 });
                     else if (timeLeft <= 0)
@@ -201,11 +206,11 @@ upsertTime = (category, id, timeSpent, subCategory, res) => {
                     subCats[category].others.limit = parseInt(y[0].others);
                     let timeLeft = parseInt(y[0][subCategory]) - timeSpent;
 
-                    if(timeLeft<=0)
+                    if (timeLeft <= 0)
                         subCats[category][subCategory].used = 0;
                     else
                         subCats[category][subCategory].used = timeSpent;
-                        
+
                     if (parseInt(y[0][subCategory]) === -1)
                         res.send({ subCategory: -1 });
                     else if (timeLeft <= 0)
@@ -221,7 +226,7 @@ upsertTime = (category, id, timeSpent, subCategory, res) => {
                 })
             }
             else {
-                res.send({subCategory:-1});
+                res.send({ subCategory: -1 });
                 usage_db.collection(category).update({ 'user_id': id }, {
                     '$push': {
                         'dates': {
@@ -257,6 +262,7 @@ updateTime = (category, id, timeSpent, subCategory) => {
 }
 
 app.post('/api/insert2', urlencodedParser, (req, res) => {
+    console.log('finally!');
     let id = req.body.id;
     let category = req.body.category;
     let timeSpent = parseInt(req.body.timeSpent);
@@ -282,8 +288,7 @@ app.post('/api/insert2', urlencodedParser, (req, res) => {
     }
     else {
         exists('others', id, 'others', timeSpent).then(result => {
-            if (result.status)
-            {
+            if (result.status) {
                 res.send(result.response);
                 updateTime('others', id, timeSpent, 'others');
             }
@@ -306,6 +311,7 @@ app.post('/api/getcategory', urlencodedParser, (req, res) => {
 
         // Adds URL Category to MongoDB
         x.then((category) => {
+            res.contentType('application/json');
             res.send(`{"msg":"${category}", "status":"${true}"}`);
         })
             .catch(error => {
@@ -428,9 +434,9 @@ app.post('/api/getuserhistory', urlencodedParser, (req, res) => {
                         // objArray2.push(obj2);
                         // objArray3.push(obj3);
                     });
-                    if(objArray1.length) data['gaming'] = objArray1;
-                    if(objArray2.length) data['onlinetv'] = objArray2;
-                    if(objArray3.length) data['socialmedia'] = objArray3;
+                    if (objArray1.length) data['gaming'] = objArray1;
+                    if (objArray2.length) data['onlinetv'] = objArray2;
+                    if (objArray3.length) data['socialmedia'] = objArray3;
                 }
                 resolve([objArray1, objArray2, objArray3]);
             })
