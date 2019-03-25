@@ -128,7 +128,6 @@ getCategory = url => {
         // "Cosine Similairty" is giving good results but not quite accurate
         // var scores = cosineSimilarity(freq, {"Gaming":category[0], "Online TV":category[1], "Social Media":category[2], "Productivity":category[3], "ECommerce":category[4]})
 
-        console.log(scores);
         return (scores[Math.max(...Object.keys(scores))].trim().toLowerCase().split(' ').join(''));
     })
 }

@@ -262,7 +262,7 @@ updateTime = (category, id, timeSpent, subCategory) => {
 }
 
 app.post('/api/insert2', urlencodedParser, (req, res) => {
-    console.log('finally!');
+    console.log('finally!', req.body);
     let id = req.body.id;
     let category = req.body.category;
     let timeSpent = parseInt(req.body.timeSpent);
@@ -311,6 +311,7 @@ app.post('/api/getcategory', urlencodedParser, (req, res) => {
 
         // Adds URL Category to MongoDB
         x.then((category) => {
+            console.log(category);
             res.contentType('application/json');
             res.send(`{"msg":"${category}", "status":"${true}"}`);
         })
