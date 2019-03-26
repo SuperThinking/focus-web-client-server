@@ -123,7 +123,9 @@ exists = (category, id, subCategory, timeSpent) => {
                             });
                         }
                         else {
-                            result['response'] = { subCategory: -1 };
+                            let tempObj = {};
+                            tempObj[subCategory] = -1;
+                            result['response'] = tempObj;
                             usage_db.collection(category).update({ 'user_id': id }, {
                                 '$push': {
                                     'dates': {
@@ -194,13 +196,14 @@ upsertTime = (category, id, timeSpent, subCategory, res) => {
                         subCats[category][subCategory].used = 0;
                     else
                         subCats[category][subCategory].used = timeSpent;
-
+                    let tempObj = {};
                     if (parseInt(y[0][subCategory]) === -1)
-                        res.send({ subCategory: -1 });
+                        tempObj[subCategory] = -1
                     else if (timeLeft <= 0)
-                        res.send({ subCategory: 0 });
+                        tempObj[subCategory] = 0
                     else
-                        res.send({ subCategory: timeLeft });
+                        tempObj[subCategory] = timeLeft
+                    res.send(tempObj);
                 }
                 else if (category === 'others') {
                     subCats[category].others.limit = parseInt(y[0].others);
@@ -211,12 +214,14 @@ upsertTime = (category, id, timeSpent, subCategory, res) => {
                     else
                         subCats[category][subCategory].used = timeSpent;
 
+                    let tempObj = {};
                     if (parseInt(y[0][subCategory]) === -1)
-                        res.send({ subCategory: -1 });
+                        tempObj[subCategory] = -1
                     else if (timeLeft <= 0)
-                        res.send({ subCategory: 0 });
+                        tempObj[subCategory] = 0
                     else
-                        res.send({ subCategory: timeLeft });
+                        tempObj[subCategory] = timeLeft
+                    res.send(tempObj);
                 }
                 else {
                     subCats[category].productiveTime.time = timeSpent;
@@ -226,7 +231,9 @@ upsertTime = (category, id, timeSpent, subCategory, res) => {
                 })
             }
             else {
-                res.send({ subCategory: -1 });
+                let tempObj = {};
+                tempObj[subCategory] = -1
+                res.send(tempObj);
                 usage_db.collection(category).update({ 'user_id': id }, {
                     '$push': {
                         'dates': {
