@@ -53,11 +53,11 @@ class UserHistory extends Component {
                 <h1>User History</h1>
                 <table>
                     <tbody>
-                        <tr><td>Start Date</td><td>End Date</td></tr>
+                        <tr className='tdHeading'><td>Start Date</td><td>End Date</td></tr>
                         <tr>
-                            <td><input className='dateInput' onChange={this.handleChange} name='startDate' type='date' value={this.state.startDate}></input></td>
-                            <td><input className='dateInput' onChange={this.handleChange} name='endDate' type='date' value={this.state.endDate}></input></td>
-                            <td><input type='submit' onClick={this.onClick} value='Submit' className='getHistoryButton' /></td>
+                            <td className='tdInput'><input className='dateInput' onChange={this.handleChange} name='startDate' type='date' value={this.state.startDate}></input></td>
+                            <td className='tdInput'><input className='dateInput' onChange={this.handleChange} name='endDate' type='date' value={this.state.endDate}></input></td>
+                            <td className='tdInput'><input type='submit' onClick={this.onClick} value='Submit' className='getHistoryButton' /></td>
                         </tr>
                     </tbody>
                 </table>

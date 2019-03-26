@@ -108,8 +108,19 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover,input[type="date"]::
     border-top-style: ridge;
     border-color: rgb(211, 110, 110);
 }
-
+.tdInput{
+    display: table-cell;
+}
+.tdHeading{
+    display: table-row;
+}
 @media (max-width: 767px) {
+    .tdInput{
+        display: table-row;
+    }
+    .tdHeading{
+        visibility: collapse;
+    }
     .hint {
         text-align: center;
         font-size: 20px;
