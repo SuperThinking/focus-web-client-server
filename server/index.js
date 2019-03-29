@@ -83,6 +83,8 @@ exists = (category, id, subCategory, timeSpent) => {
                         else
                             tempObj[subCategory] = timeLeft;
                         result['response'] = tempObj;
+                        result['used'] = timeLeft;
+                        result['limit'] = x[0].dates[0][subCategory].limit;
                     }
                     else
                         result['response'] = '{"productivity":-1}';
@@ -104,9 +106,12 @@ exists = (category, id, subCategory, timeSpent) => {
                                 else
                                     tempObj[subCategory] = timeLeft;
                                 result['response'] = tempObj;
+                                result['used'] = timeLeft;
+                                result['limit'] = y[0][subCategory];
                             }
                             else if (category === 'others') {
                                 subCats[category].others.limit = parseInt(y[0].others);
+                                let timeLeft = y[0].others - timeSpent;
                                 let tempObj = {}
                                 if (parseInt(y[0][subCategory]) === -1)
                                     tempObj[subCategory] = -1;
@@ -115,6 +120,8 @@ exists = (category, id, subCategory, timeSpent) => {
                                 else
                                     tempObj[subCategory] = timeLeft;
                                 result['response'] = tempObj;
+                                result['used'] = timeLeft;
+                                result['limit'] = y[0].others;
                             }
                             usage_db.collection(category).update({ 'user_id': id }, {
                                 '$push': {
@@ -262,16 +269,24 @@ upsertTime = (category, id, timeSpent, subCategory, res) => {
 
 }
 
-updateTime = (category, id, timeSpent, subCategory) => {
+updateTime = (category, id, timeSpent, subCategory, used, limit) => {
     var updateElement = 'dates.0.' + subCategory + '.used';
-    if (category === 'productivity')
-        updateElement = 'dates.0.productiveTime.time';
-    var incObject = {}; incObject[updateElement] = timeSpent;
-    usage_db.collection(category).update({ 'user_id': id }, {
-        '$inc': incObject
-    }, (err, res) => {
-        if (err) console.log('Error ' + err);
-    });
+    if (used >= 0) {
+        if (category === 'productivity')
+            updateElement = 'dates.0.productiveTime.time';
+        var incObject = {}; incObject[updateElement] = timeSpent;
+        usage_db.collection(category).update({ 'user_id': id }, {
+            '$inc': incObject
+        }, (err, res) => {
+            if (err) console.log('Error ' + err);
+        });
+    }
+    else {
+        var incObject = {}; incObject[updateElement] = limit;
+        usage_db.collection(category).updateOne({ 'user_id': id }, { $set: incObject }, (err, res) => {
+            if (err) console.log('Error ' + err);
+        });
+    }
 }
 
 app.post('/api/insert2', urlencodedParser, (req, res) => {
@@ -283,7 +298,8 @@ app.post('/api/insert2', urlencodedParser, (req, res) => {
         exists('entertainment', id, category, timeSpent).then(result => {
             if (result.status) {
                 res.send(result.response);
-                updateTime('entertainment', id, timeSpent, category);
+                console.log(JSON.stringify(result));
+                updateTime('entertainment', id, timeSpent, category, result.used, result.limit);
             }
             else {
                 upsertTime('entertainment', id, timeSpent, category, res);
@@ -294,7 +310,7 @@ app.post('/api/insert2', urlencodedParser, (req, res) => {
         exists('productivity', id, "", timeSpent).then(result => {
             res.send({ 'productivity': -1 });
             if (result.status)
-                updateTime('productivity', id, timeSpent, null);
+                updateTime('productivity', id, timeSpent, null, 1, 1);
             else
                 upsertTime('productivity', id, timeSpent, null);
         });
@@ -303,7 +319,7 @@ app.post('/api/insert2', urlencodedParser, (req, res) => {
         exists('others', id, 'others', timeSpent).then(result => {
             if (result.status) {
                 res.send(result.response);
-                updateTime('others', id, timeSpent, 'others');
+                updateTime('others', id, timeSpent, 'others', result.used, result.limit);
             }
             else
                 upsertTime('others', id, timeSpent, 'others', res);
@@ -566,23 +582,47 @@ app.post('/api/modifylimit', urlencodedParser, (req, res) => {
                         reject('Error ' + err);
                     }
                     else {
-                        usage_db.collection('entertainment').find({ 'user_id': req.body.id }).toArray().then(x => {
-                            if (x.length) {
-                                if (x[0].dates.length && convDate(x[0].dates[0].date) === currentDate) {
-                                    usage_db.collection('entertainment').updateOne({ 'user_id': req.body.id }, { '$set': { 'dates.0.gaming.limit': gaming, 'dates.0.onlinetv.limit': onlinetv, 'dates.0.socialmedia.limit': socialmedia } }, (err, res) => {
-                                        if (err) {
-                                            console.log(err);
-                                            reject('Error ' + err);
-                                        }
+                        var modifyEntertainment = new Promise((resolve, reject) => {
+                            usage_db.collection('entertainment').find({ 'user_id': req.body.id }).toArray().then(x => {
+                                if (x.length) {
+                                    if (x[0].dates.length && convDate(x[0].dates[0].date) === currentDate) {
+                                        usage_db.collection('entertainment').updateOne({ 'user_id': req.body.id }, { '$set': { 'dates.0.gaming.limit': gaming, 'dates.0.onlinetv.limit': onlinetv, 'dates.0.socialmedia.limit': socialmedia } }, (err, res) => {
+                                            if (err) {
+                                                console.log(err);
+                                                reject('Error ' + err);
+                                            }
+                                            resolve('Limits Modified');
+                                        });
+                                    }
+                                    else
                                         resolve('Limits Modified');
-                                    });
                                 }
                                 else
                                     resolve('Limits Modified');
-                            }
-                            else
-                                resolve('Limits Modified');
+                            });
                         });
+                        var modifyOthers = new Promise((resolve, reject) => {
+                            usage_db.collection('others').find({ 'user_id': req.body.id }).toArray().then(x => {
+                                if (x.length) {
+                                    if (x[0].dates.length && convDate(x[0].dates[0].date) === currentDate) {
+                                        usage_db.collection('others').updateOne({ 'user_id': req.body.id }, { '$set': { 'dates.0.others.limit': others } }, (err, res) => {
+                                            if (err) {
+                                                console.log(err);
+                                                reject('Error ' + err);
+                                            }
+                                            resolve('Limits Modified');
+                                        });
+                                    }
+                                    else
+                                        resolve('Limits Modified');
+                                }
+                                else
+                                    resolve('Limits Modified');
+                            });
+                        });
+                        Promise.all([modifyEntertainment, modifyOthers]).then(x => {
+                            resolve('Limits Modified');
+                        })
                     }
                 });
             }
