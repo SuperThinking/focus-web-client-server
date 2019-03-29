@@ -8,6 +8,11 @@ var crawler = require('./components/crawlerTrain');
 const currentDate = require('./components/currentDate').today;
 var convDate = require('./components/currentDate').convertDate;
 var dateAndMonth = require('./components/currentDate').dateAndMonth;
+var preDefined = {
+    "https://www.youtube.com": "onlinetv",
+    "https://youtube.com": "onlinetv",
+    "http://www.medium.com": "productivity"
+}
 
 const port = process.env.PORT || 5000;
 
@@ -310,28 +315,32 @@ app.post('/api/insert2', urlencodedParser, (req, res) => {
 */
 app.post('/api/getcategory', urlencodedParser, (req, res) => {
     let url = req.body.url;
-    axios(url).then(response => {
-        var x = new Promise((resolve, reject) => {
-            // resolve(parseClassify.findCategory(url));
-            resolve(crawler.getCategory(url));
-        });
+    if (url in preDefined)
+        res.send(`{"msg":"${preDefined[url]}", "status":"${true}"}`);
+    else {
+        axios(url).then(response => {
+            var x = new Promise((resolve, reject) => {
+                // resolve(parseClassify.findCategory(url));
+                resolve(crawler.getCategory(url));
+            });
 
-        // Adds URL Category to MongoDB
-        x.then((category) => {
-            console.log(category);
-            res.contentType('application/json');
-            res.send(`{"msg":"${category}", "status":"${true}"}`);
+            // Adds URL Category to MongoDB
+            x.then((category) => {
+                console.log(category);
+                res.contentType('application/json');
+                res.send(`{"msg":"${category}", "status":"${true}"}`);
+            })
+                .catch(error => {
+                    console.log(error);
+                    res.send(`{"msg":"Unable to parse the URL", "status":"${false}"}`);
+                })
+
         })
             .catch(error => {
                 console.log(error);
-                res.send(`{"msg":"Unable to parse the URL", "status":"${false}"}`);
+                res.send(`{"msg":"Unable to reach the URL", "status":"${false}"}`);
             })
-
-    })
-        .catch(error => {
-            console.log(error);
-            res.send(`{"msg":"Unable to reach the URL", "status":"${false}"}`);
-        })
+    }
 })
 
 /*
