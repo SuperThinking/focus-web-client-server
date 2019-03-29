@@ -11,7 +11,8 @@ var dateAndMonth = require('./components/currentDate').dateAndMonth;
 var preDefined = {
     "https://www.youtube.com": "onlinetv",
     "https://youtube.com": "onlinetv",
-    "http://www.medium.com": "productivity"
+    "http://www.medium.com": "productivity",
+    "https://medium.com": "productivity"
 }
 
 const port = process.env.PORT || 5000;
