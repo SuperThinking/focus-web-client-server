@@ -29,7 +29,7 @@ class Dashboard extends Component {
             <div className='mainDashboard'>
                 <div className='dashboardHeader'>
                     {/* <div className='DheaderItems'><h2>DASHBOARD</h2></div> */}
-                    <div className='DheaderItems idHeaderItem'><h2 className='idDisplay'>{this.props.username}</h2></div>
+                    <div className='DheaderItems idHeaderItem'><h2 className='idDisplay'>{localStorage.getItem('username')}</h2></div>
                     {dashboardItems}
                 </div>
                 <div className='dashboardBody'>

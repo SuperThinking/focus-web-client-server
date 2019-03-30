@@ -114,6 +114,9 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover,input[type="date"]::
 .tdHeading{
     display: table-row;
 }
+.loadingSpinner{
+    width: 50px;
+}
 @media (max-width: 767px) {
     .tdInput{
         display: table-row;

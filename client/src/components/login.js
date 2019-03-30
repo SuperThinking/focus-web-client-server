@@ -15,6 +15,7 @@ class Login extends Component {
 
     loginAuthentication = e => {
         e.preventDefault();
+        localStorage.setItem('username', this.state.username);
         var data = {
             "username": this.state.username,
             "password": this.state.password
