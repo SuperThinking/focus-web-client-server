@@ -14,3 +14,7 @@ and the user can only use them for the set amount of time that can be set from t
 
 Chrome Extension => https://github.com/XMIRTUNJAY/focus-extension <br/>
 Android App => [Coming Soon]
+
+## License and Copyright
+© Vishal Dhawan, Vellore Institute of Technology Chennai<br/>
+Licensed under the [MIT License](LICENSE)
