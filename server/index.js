@@ -12,7 +12,8 @@ var preDefined = {
     "https://www.youtube.com": "onlinetv",
     "https://youtube.com": "onlinetv",
     "http://www.medium.com": "productivity",
-    "https://medium.com": "productivity"
+    "https://medium.com": "productivity",
+    "https://stackoverflow.com/": "productivity"
 }
 
 const port = process.env.PORT || 5000;

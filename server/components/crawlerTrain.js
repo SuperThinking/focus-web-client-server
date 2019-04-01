@@ -53,6 +53,9 @@ preprocess = (data, url) => {
     const stpwrds_options = { 'lang': 'en' };
 
     var tokens = nlp.tokenizer(data, tokenizer_options);
+    // console.log(tokens.length)    
+    tokens = tokens.slice(0, 2000);
+    // console.log(tokens.length)
     return new Promise((resolve, reject) => {
         nlp.stopwords(tokens, stpwrds_options)
             .then(tokens => {
