@@ -8,13 +8,13 @@ class QuotaLeft extends Component {
         msgB: 1
     }
     componentDidMount() {
-        this.setState({msgB:1});
+        this.setState({ msgB: 1 });
         const data = {
             'id': this.props.unique_id,
             'today': true
         }
         Axios.post('/api/getuserhistory', data).then((response) => {
-            this.setState({msgB:0});
+            this.setState({ msgB: 0 });
             console.log(response.data.data);
             this.setState({ data: response.data.data });
         });
@@ -24,7 +24,7 @@ class QuotaLeft extends Component {
             if (this.state.data[x].length && 'limit' in this.state.data[x][0]) {
                 return <div key={x}>{(this.state.data[x][0].limit - this.state.data[x][0].used)} minutes left for {x}</div>;
             }
-            else if(this.state.data[x].length) {
+            else if (this.state.data[x].length) {
                 // console.log("THIS=>"+this.state.data[x][0]);
                 return <div key={x}>{(this.state.data[x][0].used)} minutes spent in Productivity</div>;
             }

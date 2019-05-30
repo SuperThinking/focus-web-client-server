@@ -1,5 +1,3 @@
-//https://monkeylearn.com/blog/practical-explanation-naive-bayes-classifier/
-
 //NOTES
 //Tried Laplace Smoothing, but didn't work.
 
