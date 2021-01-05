@@ -11,7 +11,7 @@
     "author": "Vishal Dhawan",
     "license": "ISC",
     "dependencies": {
-      "axios": "^0.18.0",
+      "axios": "^0.21.1",
       "body-parser": "^1.18.3",
       "cheerio": "^1.0.0-rc.2",
       "concurrently": "^4.1.0",
