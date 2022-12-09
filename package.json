@@ -16,7 +16,7 @@
       "cheerio": "^1.0.0-rc.2",
       "concurrently": "^4.1.0",
       "event-stream": "^4.0.1",
-      "express": "^4.16.4",
+      "express": "^4.17.3",
       "htmlparser2": "^3.10.0",
       "lemmer": "^0.3.0",
       "nlp-toolkit": "^0.2.6",
