@@ -28,6 +28,7 @@ class QuotaLeft extends Component {
                 // console.log("THIS=>"+this.state.data[x][0]);
                 return <div key={x}>{(this.state.data[x][0].used)} minutes spent in Productivity</div>;
             }
+            return <div key={x}></div>;
         });
 
         return (
